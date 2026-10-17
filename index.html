@@ -84,16 +84,6 @@ nav.links button:hover, .lang button:hover { color: var(--ink) }
 .seg button + button { border-left: 1px solid var(--line) }
 .seg button[aria-pressed=true] { background: var(--sea); color: var(--sea-ink) }
 .seg button:disabled { opacity: .4; cursor: default }
-.agseg { flex-wrap: wrap } .agseg button { min-width: 58px }
-.rankgrid { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 18px; align-items: start }
-.agside { position: sticky; top: 76px; display: flex; flex-direction: column; gap: 6px; max-height: calc(100vh - 92px); overflow-y: auto }
-.aglab { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--ink-3) }
-.seg.vert { display: flex; flex-direction: column; border-radius: 8px }
-.seg.vert button { width: 100%; text-align: left; padding: 7px 12px; min-height: 34px; border-radius: 0 }
-.seg.vert button + button { border-left: 0; border-top: 1px solid var(--line) }
-@media (min-width: 761px) { #agFld { display: none } }
-@media (max-width: 760px) { .rankgrid { display: block } .agside { display: none } .fsheet .agseg { display: grid; grid-template-columns: repeat(4, 1fr) } .fsheet .agseg button { border: 0; box-shadow: inset 0 0 0 .5px var(--line) } }
-
 #filterBar.locked .filters, #filterBar.locked .fsum, .seg.mode.locked { opacity: .45; pointer-events: none }
 #filterBar.locked select { cursor: default }
 .lockmsg { display: none; font-size: 12px; color: var(--ink-3); margin: 2px 0 6px }
@@ -298,7 +288,7 @@ footer { margin-top: 24px; color: var(--ink-2); font-size: 13px; max-width: 86ch
     <div class="filters fsheet" id="fSheet">
       <div class="sheethead"><b data-t="filters"></b><button type="button" class="btn primary" id="fDone" data-t="done"></button></div>
       <div class="fld"><span data-t="sex"></span><div class="seg" id="fSex" role="group"></div></div>
-      <div class="fld" id="agFld"><span data-t="ageGroup"></span><div class="seg agseg" id="fAg" role="group"></div></div>
+      <div class="fld"><span data-t="ageGroup"></span><select id="fAg"></select></div>
       <div class="fld"><span data-t="distance"></span><div class="seg" id="fDist" role="group"></div></div>
       <div class="fld" id="suitFld"><span data-t="suit"></span><div class="seg" id="fWet" role="group"></div></div>
       <div class="fld"><span data-t="years"></span><div class="seg" id="fYears" role="group"></div></div>
@@ -519,7 +509,6 @@ function poolFor(opts = {}) {
     && (opts.anyDist || x.r.dist === +F.dist) && (F.mode === "canal" || opts.anyWet || x.r.wet === +F.wet));
 }
 const agStart = a => { const m = /(\d+)/.exec(a); return m ? +m[1] : 999; };
-let AGS = [];
 function drawFilters() {
   segment($("#fMode"), [["open", t("open")], ["canal", t("canal")]], F.mode, v => { F.mode = v; if (!DISTS[v].includes(+F.dist)) F.dist = DISTS[v][v === "open" ? 3 : 0];
     if (KF.dist !== "all" && !DISTS[v].includes(+KF.dist)) KF.dist = "all"; if (KF.brand !== "all" && !brandsFor().includes(KF.brand)) KF.brand = "all"; store.set("clubF", KF);
@@ -534,14 +523,12 @@ function drawFilters() {
   for (const x of poolFor()) if (x.ag && x.pa) counts[x.ag] = (counts[x.ag] || 0) + 1;
   const ags = Object.keys(counts).sort((a, b) => agStart(a) - agStart(b) || a.localeCompare(b));
   if (ags.length && !ags.includes(F.ag)) F.ag = ags.reduce((a, b) => counts[b] > counts[a] ? b : a);
-  AGS = ags;
-  // age groups as buttons (g): a wrapping row in the filter bar / phone sheet, a vertical column beside the ranking on desktop
-  segment($("#fAg"), ags.length ? ags.map(a => [a, esc(a)]) : [["", "–", true]], F.ag, v => { F.ag = v; changed(); });
-  document.body.classList.toggle("v-rank", view.name === "rank");
+  $("#fAg").innerHTML = ags.length ? ags.map(a => `<option value="${esc(a)}" ${a === F.ag ? "selected" : ""}>${esc(a)}</option>`).join("") : `<option>–</option>`;
+  $("#fAg").onchange = e => { F.ag = e.target.value; changed(); };
   // a swimmer page shows filters for context only (g): nothing in the bar responds there
   const lock = view.name === "swimmer";
   $("#filterBar").classList.toggle("locked", lock); $("#fMode").classList.toggle("locked", lock);
-  $("#fSum").disabled = lock;
+  $("#fAg").disabled = $("#fSum").disabled = lock;
   if (lock) document.querySelectorAll("#fSheet .seg button, #fMode button").forEach(b => { b.disabled = true; b.tabIndex = -1; });
   $("#fSum").innerHTML = `<span>${[t(F.sex), F.ag, t("km", F.dist), F.mode === "canal" ? "" : (+F.wet ? t("wet") : t("skin")), F.years === "all" ? "" : t("lastN", +F.years)].filter(Boolean).map(esc).join(" · ")}</span><small>${t("change")}</small>`;
 }
@@ -571,8 +558,7 @@ function renderRank() {
   const at = hl == null ? -1 : rows.findIndex(r => r.s.i === hl);
   if (at >= limit) limit = Math.ceil((at + 1) / 100) * 100;
   const shown = rows.slice(0, limit);
-  $("#main").innerHTML = `<div class="rankgrid"><aside class="agside" aria-label="${esc(t("ageGroup"))}"><div class="aglab">${t("ageGroup")}</div><div class="seg vert" id="agSide" role="group"></div></aside><div class="rankmain">
-  <p class="hint">${t("rankHint", total, raceCount)}</p>
+  $("#main").innerHTML = `<p class="hint">${t("rankHint", total, raceCount)}</p>
   <div class="panel"><div class="tablewrap">${rows.length ? `<table class="rank">
     <thead><tr><th class="num">${t("colRank")}</th><th>${t("colName")}</th><th class="hide-sm">${t("colClub")}</th>
       <th class="num hide-sm">${t("colRaces")}</th><th class="num">${t("colAvg")}</th><th class="num">${t("colMedals")}</th><th class="num hide-sm">${t("colBest")}</th><th class="hide-sm">${t("colLast")}</th></tr></thead>
@@ -584,8 +570,7 @@ function renderRank() {
       <td class="num c-m">${medTxt(r.med)}</td>
       <td class="num hide-sm">${t("top", pctTxt(r.sc.best))}</td>
       <td class="sub hide-sm">${esc(raceName(r.last.r))}</td></tr>`).join("")}</tbody></table>` : `<div class="empty">${t("noRows")}</div>`}</div>
-    ${rows.length > limit ? `<button class="more" type="button" id="more">${t("moreRows", Math.min(100, rows.length - limit))}</button>` : ""}</div></div></div>`;
-  segment($("#agSide"), AGS.map(a => [a, esc(a)]), F.ag, v => { F.ag = v; changed(); });
+    ${rows.length > limit ? `<button class="more" type="button" id="more">${t("moreRows", Math.min(100, rows.length - limit))}</button>` : ""}</div>`;
   const more = $("#more"); if (more) more.onclick = () => { limit += 100; renderRank(); };
   bindRows();
   const me = document.querySelector("tr.me"); if (me) me.scrollIntoView({ block: "center" });
