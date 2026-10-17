@@ -17,7 +17,7 @@
   --line: #d9e1e7; --sea: #0e5a7a; --sea-ink: #ffffff; --buoy: #e8641e; --sel: #e3eef4; --grid: #e6ecf0;
   --gold: #b88a00; --silver: #7f8c95; --bronze: #a0592f;
   --d1000: #2a78d6; --d2000: #eb6834; --d3000: #1baf7a; --d5000: #eda100;
-  --d6000: #e87ba4; --d10000: #008300; --d6500: #6250d6; --d4500: #e34948; --d7000: #00968f;
+  --d6000: #e87ba4; --d10000: #008300; --d6500: #6250d6; --d4500: #e34948; --d7000: #6d4c41;
   --pA: #2a78d6; --pB: #eb6834;
   --display: "Barlow Condensed", "Arial Narrow", sans-serif;
   --body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
@@ -28,14 +28,14 @@
   --line: #22394a; --sea: #5fb3d9; --sea-ink: #0b1820; --buoy: #f07a3a; --sel: #173445; --grid: #1a2e3b;
   --gold: #e0b42a; --silver: #b3bfc7; --bronze: #c9825a;
   --d1000: #3987e5; --d2000: #d95926; --d3000: #199e70; --d5000: #c98500;
-  --d6000: #d55181; --d10000: #2f9a2f; --d6500: #9085e9; --d4500: #e66767; --d7000: #2fa9a1;
+  --d6000: #d55181; --d10000: #2f9a2f; --d6500: #9085e9; --d4500: #e66767; --d7000: #8d6e63;
   --pA: #3987e5; --pB: #d95926; color-scheme: dark } }
 :root[data-theme="dark"] {
   --bg: #0b1820; --surface: #11222d; --ink: #e6eef3; --ink-2: #a9bac5; --ink-3: #8a9daa;
   --line: #22394a; --sea: #5fb3d9; --sea-ink: #0b1820; --buoy: #f07a3a; --sel: #173445; --grid: #1a2e3b;
   --gold: #e0b42a; --silver: #b3bfc7; --bronze: #c9825a;
   --d1000: #3987e5; --d2000: #d95926; --d3000: #199e70; --d5000: #c98500;
-  --d6000: #d55181; --d10000: #2f9a2f; --d6500: #9085e9; --d4500: #e66767; --d7000: #2fa9a1;
+  --d6000: #d55181; --d10000: #2f9a2f; --d6500: #9085e9; --d4500: #e66767; --d7000: #8d6e63;
   --pA: #3987e5; --pB: #d95926; color-scheme: dark }
 * { box-sizing: border-box }
 [hidden] { display: none !important }
@@ -122,6 +122,7 @@ td { padding: 8px 10px; border-bottom: 1px solid var(--grid); vertical-align: mi
 tr:last-child td { border-bottom: 0 }
 .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap }
 .mono { font-family: var(--mono); font-size: 13px }
+td.pace { font-weight: 700; font-size: 14px; color: var(--ink) } td.pace .sm { font-weight: 400 }
 tbody tr.go { cursor: pointer }
 tbody tr.go:hover { background: var(--sel) }
 tr.out td { color: var(--ink-3) }
@@ -597,6 +598,7 @@ function groupByDist(res) {
   return [...m].sort((a, b) => (a[1][0].r.canal - b[1][0].r.canal) || a[0] - b[0]);
 }
 const medal = p => p && p <= 3 ? `<span class="medal m${p}" aria-label="${p}">${p}</span>` : "";
+const SL = { s: -1, brand: "all", dist: "all" }; // race-list filters on a swimmer page, reset per swimmer
 function renderSwimmer(s) {
   const groups = groupByDist(s.res);
   const ags = [...new Set(s.res.map(x => x.ag).filter(Boolean))].reverse();
@@ -619,18 +621,28 @@ function renderSwimmer(s) {
   <div class="panel"><div class="phead"><h3>${t("historyH")}</h3>
     <div class="seg" id="metric" role="group"></div></div>
     <div class="legend" id="legend"></div><div class="chartbox chart" id="chart"></div></div>
-  <div class="panel"><div class="phead"><h3>${t("raceListH")}</h3><span class="sub">${s.res.length} ${t("races")}</span></div>
+  <div class="panel"><div class="phead"><h3>${t("raceListH")}</h3><span class="sub" id="slCount"></span></div>
+    <div class="ctrls slf"><div class="fld"><span>${t("series")}</span>${selectHTML("slBrand", [["all", t("all")], ...[...new Set(s.res.map(x => x.r.brand))].sort().map(b => [b, b])], SL.brand)}</div>
+      <div class="fld"><span>${t("distance")}</span>${selectHTML("slDist", [["all", t("all")], ...DISTS.all.filter(d => s.res.some(x => x.r.dist === d)).map(d => [d, t("km", d)])], SL.dist)}</div></div>
     <div class="tablewrap"><table><thead><tr><th class="hide-sm">${t("colDate")}</th><th>${t("colRace")}</th><th>${t("colDist")}</th>
-      <th class="num">${t("colTime")}</th><th class="num hide-sm">${t("colPace")}</th><th class="num">${t("colAgPct")}</th><th class="num hide-sm">${t("colAllPct")}</th></tr></thead>
-    <tbody>${s.res.map(x => { const out = x.time == null; return `<tr class="go${out ? " out" : ""}" tabindex="0" data-r="${x.r.i}">
+      <th class="num">${t("colPace")}</th><th class="num hide-sm">${t("colTime")}</th><th class="num">${t("colAgPct")}</th><th class="num hide-sm">${t("colAllPct")}</th></tr></thead>
+    <tbody id="slBody"></tbody></table></div></div>`;
+  const slRows = () => s.res.filter(x => (SL.brand === "all" || x.r.brand === SL.brand) && (SL.dist === "all" || x.r.dist === +SL.dist));
+  const drawSL = () => { const rs = slRows(); $("#slCount").textContent = `${rs.length} ${t("races")}`;
+    $("#slBody").innerHTML = rs.map(x => { const out = x.time == null; return `<tr class="go${out ? " out" : ""}" tabindex="0" data-r="${x.r.i}">
       <td class="num hide-sm" style="text-align:left">${dateTxt(x.r)}</td><td>${esc(x.r.brand)}${x.r.stage ? ` <span class="sub">${esc(x.r.stage)}</span>` : ""}<span class="sm">${dateTxt(x.r)}</span></td>
       <td><span class="dot" style="--c:${dcol(x.r.dist)}"></span>${t("km", x.r.dist)}${x.r.canal ? "" : ` <span class="sub">${x.r.wet ? t("wet") : t("skin")}</span>`}</td>
-      <td class="num mono">${out ? (x.st || t("dnf")) : fmtT(x.time)}<span class="sm">${fmtP(paceOf(x))}/100m</span></td><td class="num mono hide-sm">${fmtP(paceOf(x))}</td>
+      <td class="num mono pace">${out ? (x.st || t("dnf")) : fmtP(paceOf(x))}<span class="sm">${out ? "" : fmtT(x.time)}</span></td><td class="num mono hide-sm">${out ? "" : fmtT(x.time)}</td>
       <td class="num">${x.pa ? `${t("top", pctTxt(x.pctA))} <span class="sub">${x.pa}/${x.na}</span>${medal(x.pa)}` : "–"}</td>
-      <td class="num hide-sm">${x.ps ? `${t("top", pctTxt(x.pctS))} <span class="sub">${x.ps}/${x.ns}</span>${medal(x.ps)}` : "–"}</td></tr>`; }).join("")}</tbody></table></div></div>`;
+      <td class="num hide-sm">${x.ps ? `${t("top", pctTxt(x.pctS))} <span class="sub">${x.ps}/${x.ns}</span>${medal(x.ps)}` : "–"}</td></tr>`; }).join("");
+    document.querySelectorAll("tr.go[data-r]").forEach(tr => { const o = () => go(`#/r/${tr.dataset.r}`); tr.onclick = o; tr.onkeydown = e => { if (e.key === "Enter") o(); }; }); };
+  if (SL.s !== s.i) Object.assign(SL, { s: s.i, brand: "all", dist: "all" });
+  $("#slBrand").value = SL.brand; $("#slDist").value = SL.dist;
+  $("#slBrand").onchange = e => { SL.brand = e.target.value; drawSL(); };
+  $("#slDist").onchange = e => { SL.dist = e.target.value; drawSL(); };
+  drawSL();
   $("#back").onclick = () => { hl = s.i; go("#/"); };
   const cat = $("#catCard"); if (cat) cat.onclick = () => { hl = s.i; go("#/"); };
-  document.querySelectorAll("tr.go[data-r]").forEach(tr => { const o = () => go(`#/r/${tr.dataset.r}`); tr.onclick = o; tr.onkeydown = e => { if (e.key === "Enter") o(); }; });
   const drawM = () => { segment($("#metric"), [["pct", t("percentile")], ["pace", t("pace")]], metric, v => { metric = v; store.set("metric", v); drawM(); }); drawChart(s, groups); };
   drawM();
 }
@@ -910,7 +922,7 @@ function render(scroll) {
   document.querySelectorAll(".lang button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
   const nav = { rank: "rank", swimmer: "rank", races: "races", race: "races", clubs: "clubs", club: "clubs" }[view.name];
   document.querySelectorAll("[data-nav]").forEach(b => b.dataset.nav === nav ? b.setAttribute("aria-current", "page") : b.removeAttribute("aria-current"));
-  $("#filterBar").hidden = !(view.name === "rank" || view.name === "swimmer");
+  $("#filterBar").hidden = view.name !== "rank"; $("#fMode").hidden = view.name === "swimmer"; // swimmer page: no filters at all (g, 2026-10-17)
   if (scroll) sheet(false);
   drawFilters();
   if (view.name === "rank") renderRank();
