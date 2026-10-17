@@ -249,6 +249,8 @@ footer { margin-top: 24px; color: var(--ink-2); font-size: 13px; max-width: 86ch
   .sheetwrap.open .sheetbg { display: block; position: fixed; inset: 0; background: rgb(0 0 0 / .4); z-index: 45 }
   .sheetwrap.open .sheethead { display: flex; justify-content: space-between; align-items: center; font-family: var(--display); font-size: 20px }
   .fsheet .seg { display: flex } .fsheet .seg button { flex: 1 } .fsheet select { width: 100% }
+  .fsheet #fDist { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line) }
+  .fsheet #fDist button { border: 0; background: var(--surface); white-space: nowrap } .fsheet #fDist button[aria-pressed=true] { background: var(--sea) }
   .two { grid-template-columns: 1fr }
   .picker { grid-template-columns: 1fr; gap: 10px }
   .plist { flex-direction: row; overflow-x: auto; gap: 6px; padding: 8px }
@@ -330,7 +332,7 @@ const T = {
     races: "yarış", race: "yarış", totalRaces: "Toplam yarış", best: "en iyi", top: p => `ilk %${p}`,
     pace: "Tempo", percentile: "Yüzdelik", paceAxis: "dk/100 m (yukarısı daha hızlı)", pctAxis: "yaş grubu yüzdeliği (yukarısı daha iyi)",
     historyH: "Yıllara göre", raceListH: "Tüm yarışlar", colDate: "Tarih", colRace: "Yarış", colDist: "Mesafe", colTime: "Süre",
-    colPace: "Tempo", colAgPct: "Yaş grubu", colAllPct: "Genel", ageGroups: "Yaş grupları", clubs: "Kulüpler",
+    colPace: "Tempo", colAgPct: "Yaş grubu", colAllPct: "Genel", ageGroups: "Yaş grupları", clubs: "Kulüpler", born: "Doğum yılı", bornEst: "Tahmini doğum yılı",
     compareBtn: "Karşılaştır", cmpTitle: "Yüzücü karşılaştırma", cmpPick: "İkinci yüzücüyü seçin", rivals: "Sık karşılaştığı rakipler",
     attendance: "Katılım", radarNote: "Dış halka daha iyi: yaş grubu yüzdeliği (ilk %0 = dış kenar). Katılım: yarış sayısı, en çok yarışana göre.",
     perDist: "Mesafe bazında", headToHead: "Ortak yarışlar", ahead: (a, n) => `${a}, ${n} ortak yarışta öndeydi`, noShared: "Ortak yarış yok.",
@@ -362,7 +364,7 @@ const T = {
     races: "races", race: "race", totalRaces: "Total races", best: "best", top: p => `top ${p}%`,
     pace: "Pace", percentile: "Percentile", paceAxis: "min/100 m (higher is faster)", pctAxis: "age-group percentile (higher is better)",
     historyH: "By year", raceListH: "All races", colDate: "Date", colRace: "Race", colDist: "Distance", colTime: "Time",
-    colPace: "Pace", colAgPct: "Age group", colAllPct: "Overall", ageGroups: "Age groups", clubs: "Clubs",
+    colPace: "Pace", colAgPct: "Age group", colAllPct: "Overall", ageGroups: "Age groups", clubs: "Clubs", born: "Born", bornEst: "Estimated birth year",
     compareBtn: "Compare", cmpTitle: "Swimmer comparison", cmpPick: "Pick a second swimmer", rivals: "Frequent rivals",
     attendance: "Attendance", radarNote: "Outer ring is better: age-group percentile (top 0% = outer edge). Attendance: races swum, relative to whoever swam more.",
     perDist: "By distance", headToHead: "Shared races", ahead: (a, n) => `${a} finished ahead in ${n} shared races`, noShared: "No shared races.",
@@ -394,7 +396,7 @@ const T = {
     races: "заплывов", race: "заплыв", totalRaces: "Всего заплывов", best: "лучший", top: p => `топ ${p}%`,
     pace: "Темп", percentile: "Процентиль", paceAxis: "мин/100 м (выше — быстрее)", pctAxis: "процентиль в возрастной группе (выше — лучше)",
     historyH: "По годам", raceListH: "Все заплывы", colDate: "Дата", colRace: "Заплыв", colDist: "Дистанция", colTime: "Время",
-    colPace: "Темп", colAgPct: "Возр. группа", colAllPct: "Абсолют", ageGroups: "Возрастные группы", clubs: "Клубы",
+    colPace: "Темп", colAgPct: "Возр. группа", colAllPct: "Абсолют", born: "Год рождения", bornEst: "Примерный год рождения", ageGroups: "Возрастные группы", clubs: "Клубы",
     compareBtn: "Сравнить", cmpTitle: "Сравнение пловцов", cmpPick: "Выберите второго пловца", rivals: "Частые соперники",
     attendance: "Участие", radarNote: "",
     perDist: "По дистанциям", headToHead: "Общие заплывы", ahead: (a, n) => `${a} финишировал(а) впереди в ${n} общих заплывах`, noShared: "Общих заплывов нет.",
@@ -423,7 +425,7 @@ const RACES = D.races.map(([brand, year, stage, date, dist, wet, canal], i) => (
 // "AHMET YILMAZ" / "ahmet yılmaz" -> "Ahmet Yılmaz"; words already in mixed case ("McDonald") are kept
 const tc = n => String(n).split(/(\s+)/).map(w => w === w.toLocaleUpperCase("tr") || w === w.toLocaleLowerCase("tr")
   ? w.toLocaleLowerCase("tr").replace(/(^|[.\-'’(])(\p{L})/gu, (m, a, b) => a + b.toLocaleUpperCase("tr")) : w).join("");
-const SW = D.swimmers.map(([name, sex, clubs, variants, unnamed = 0], i) => ({ i, name: unnamed ? t("unreadable") : tc(name), sex, clubs, variants: variants.map(tc), unnamed, res: [] }));
+const SW = D.swimmers.map(([name, sex, clubs, variants, unnamed = 0, birth = null], i) => ({ i, name: unnamed ? t("unreadable") : tc(name), sex, clubs, variants: variants.map(tc), unnamed, birth, res: [] }));
 const CLUBS = (D.clubs || []).map((name, i) => ({ i, name }));
 const ALL = D.results.map(([s, r, ag, time, st, ps, ns, pa, na, c = -1]) => {
   const x = { s, r: RACES[r], ag, time, st, ps, ns, pa, na, c,
@@ -434,6 +436,10 @@ const ALL = D.results.map(([s, r, ag, time, st, ps, ns, pa, na, c = -1]) => {
 SW.forEach(s => s.res.sort((a, b) => (b.r.date || "").localeCompare(a.r.date || "") || b.r.year - a.r.year));
 const MAXY = Math.max(...RACES.map(r => r.year));
 const DISTS = { open: [1000, 2000, 3000, 5000, 6000, 10000], canal: [6500, 4500, 7000] };
+DISTS.all = [...DISTS.open, ...DISTS.canal];
+const isCanalD = d => DISTS.canal.includes(+d);
+// mode "all" (default) mixes open water and strait crossings; the other two narrow to one kind
+const inMode = r => F.mode === "all" || r.canal === (F.mode === "canal" ? 1 : 0);
 const dcol = d => `var(--d${d})`;
 const fold = s => String(s).toLocaleLowerCase("tr").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/ı/g, "i");
 SW.forEach(s => { s.key = [s.name, ...s.variants].map(fold).join(" | "); s.n = s.res.length; });
@@ -462,7 +468,8 @@ function score(list, key = "pctA", nkey = "na") {
 const distKey = r => r.dist; // canal distances are unique (6500 Boğaziçi, 4500 Çanakkale, 7000 Meis–Kaş)
 
 /* ---------- state ---------- */
-const F = Object.assign({ mode: "open", sex: "M", ag: "35-39", dist: 5000, wet: 0, years: "all", cut: 15 }, store.get("filters", {}));
+const F = Object.assign({ mode: "all", sex: "M", ag: "35-39", dist: 5000, wet: 0, years: "all", cut: 15 }, store.get("filters", {}));
+if (F.fv !== 2) { F.mode = "all"; F.fv = 2; } // strait crossings included by default (g, 2026-10-17)
 let view = { name: "rank" }, limit = 100, metric = store.get("metric", "pct"), cmpB = null;
 
 /* ---------- search (top bar and compare slots) ---------- */
@@ -505,18 +512,18 @@ function segment(el, opts, cur, onSet) {
 }
 function poolFor(opts = {}) {
   const yMin = F.years === "all" ? 0 : MAXY - +F.years + 1;
-  return ALL.filter(x => x.r.canal === (F.mode === "canal" ? 1 : 0) && SW[x.s].sex === F.sex && x.r.year >= yMin
-    && (opts.anyDist || x.r.dist === +F.dist) && (F.mode === "canal" || opts.anyWet || x.r.wet === +F.wet));
+  return ALL.filter(x => inMode(x.r) && SW[x.s].sex === F.sex && x.r.year >= yMin
+    && (opts.anyDist || x.r.dist === +F.dist) && (x.r.canal || opts.anyWet || x.r.wet === +F.wet));
 }
 const agStart = a => { const m = /(\d+)/.exec(a); return m ? +m[1] : 999; };
 function drawFilters() {
-  segment($("#fMode"), [["open", t("open")], ["canal", t("canal")]], F.mode, v => { F.mode = v; if (!DISTS[v].includes(+F.dist)) F.dist = DISTS[v][v === "open" ? 3 : 0];
+  segment($("#fMode"), [["all", t("all")], ["open", t("open")], ["canal", t("canal")]], F.mode, v => { F.mode = v; if (!DISTS[v].includes(+F.dist)) F.dist = DISTS[v][v === "canal" ? 0 : 3];
     if (KF.dist !== "all" && !DISTS[v].includes(+KF.dist)) KF.dist = "all"; if (KF.brand !== "all" && !brandsFor().includes(KF.brand)) KF.brand = "all"; store.set("clubF", KF);
     if (view.name === "race") { store.set("filters", F); go("#/races"); } else changed(); });
   segment($("#fSex"), [["F", t("F")], ["M", t("M")]], F.sex, v => { F.sex = v; changed(); });
   const hasDist = new Set(poolFor({ anyDist: true, anyWet: true }).map(x => x.r.dist));
   segment($("#fDist"), DISTS[F.mode].map(d => [d, t("km", d), !hasDist.has(d)]), F.dist, v => { F.dist = +v; changed(); });
-  $("#suitFld").hidden = F.mode === "canal";
+  $("#suitFld").hidden = isCanalD(F.dist);
   segment($("#fWet"), [[0, t("skin")], [1, t("wet")]], F.wet, v => { F.wet = +v; changed(); });
   segment($("#fYears"), [["all", t("allYears")], ["1", t("lastN", 1)], ["2", t("lastN", 2)], ["3", t("lastN", 3)]], F.years, v => { F.years = v; changed(); });
   const counts = {};
@@ -530,7 +537,7 @@ function drawFilters() {
   $("#filterBar").classList.toggle("locked", lock); $("#fMode").classList.toggle("locked", lock);
   $("#fAg").disabled = $("#fSum").disabled = lock;
   if (lock) document.querySelectorAll("#fSheet .seg button, #fMode button").forEach(b => { b.disabled = true; b.tabIndex = -1; });
-  $("#fSum").innerHTML = `<span>${[t(F.sex), F.ag, t("km", F.dist), F.mode === "canal" ? "" : (+F.wet ? t("wet") : t("skin")), F.years === "all" ? "" : t("lastN", +F.years)].filter(Boolean).map(esc).join(" · ")}</span><small>${t("change")}</small>`;
+  $("#fSum").innerHTML = `<span>${[t(F.sex), F.ag, t("km", F.dist), isCanalD(F.dist) ? "" : (+F.wet ? t("wet") : t("skin")), F.years === "all" ? "" : t("lastN", +F.years)].filter(Boolean).map(esc).join(" · ")}</span><small>${t("change")}</small>`;
 }
 function changed() { store.set("filters", F); limit = 100; render(); }
 const sheet = open => { $("#filterBar").classList.toggle("open", open); $("#fSum").setAttribute("aria-expanded", String(open)); };
@@ -596,12 +603,12 @@ function renderSwimmer(s) {
   $("#main").innerHTML = `<button class="back" type="button" id="back">← ${t("backRank")}</button>
   <div class="panel"><div class="prof">
     <div class="ptop"><div><h1 class="pname">${esc(s.name)}</h1>
-      <div class="meta">${t(s.sex) || ""}${ags.length ? ` · ${t("ageGroups")}: ${ags.map(esc).join(", ")}` : ""}</div>
+      <div class="meta">${t(s.sex) || ""}${s.birth ? ` · ${t(s.birth[2] ? "born" : "bornEst")}: ${s.birth[0] === s.birth[1] ? (s.birth[2] ? "" : "~") + s.birth[0] : s.birth[0] + "–" + s.birth[1]}` : ""}${ags.length ? ` · ${t("ageGroups")}: ${ags.map(esc).join(", ")}` : ""}</div>
       ${(() => { const cs = [...new Set(s.res.map(x => x.c).filter(c => c >= 0))];
         return cs.length ? `<div class="meta">${t("clubs")}: ${cs.map(c => `<a class="clink" href="#/k/${c}">${esc(CLUBS[c].name)}</a>`).join(" · ")}</div>` : ""; })()}</div>
 </div>
     <div class="strip">
-      ${(() => { const { rows, total } = rankRows(), k = rows.findIndex(r => r.s.i === s.i), lab = [F.ag, t("km", F.dist), F.mode === "canal" ? "" : (+F.wet ? t("wet") : t("skin"))].filter(Boolean).join(" · ");
+      ${(() => { const { rows, total } = rankRows(), k = rows.findIndex(r => r.s.i === s.i), lab = [F.ag, t("km", F.dist), isCanalD(F.dist) ? "" : (+F.wet ? t("wet") : t("skin"))].filter(Boolean).join(" · ");
         return k < 0 ? `<div class="stat" style="--c:var(--buoy)"><div class="k">${esc(lab)}</div><div class="v">–</div><div class="s">${t("notInCat")}</div></div>`
           : `<div class="stat link" id="catCard" role="link" tabindex="0" style="--c:var(--buoy)"><div class="k">${esc(lab)}</div><div class="v">${t("top", Math.round(rows[k].rp) || 1)}</div>
             <div class="s">${k + 1} / ${total} · <a href="#/" onclick="return false">${t("showInRank")}</a></div></div>`; })()}
@@ -679,7 +686,7 @@ const FIN = new Map(); for (const x of ALL) if (x.time != null) FIN.set(x.r.i, (
 const raceRow = r => `<tr class="go" tabindex="0" data-r="${r.i}"><td><span class="dot" style="--c:${dcol(r.dist)}"></span>${t("km", r.dist)}</td>
   <td>${r.canal ? "" : (r.wet ? t("wet") : t("skin"))}</td><td class="num">${FIN.get(r.i) || 0} <span class="sub">${t("finishers")}</span></td></tr>`;
 function renderRaces() {
-  const mr = RACES.filter(r => r.canal === (F.mode === "canal" ? 1 : 0));
+  const mr = RACES.filter(r => inMode(r));
   const years = [...new Set(mr.map(r => r.year))].sort((a, b) => b - a);
   const brands = [...new Set(mr.map(r => r.brand))].sort((a, b) => mr.filter(r => r.brand === b).length - mr.filter(r => r.brand === a).length);
   const byYear = RV.by === "year";
@@ -759,8 +766,8 @@ function medalsWhere(keep) {
   for (const x of ALL) { const p = placeOf(x); if (x.c >= 0 && p && p <= 3 && keep(x)) out.push({ x, p }); }
   return out;
 }
-const brandsFor = () => BRANDS.filter(b => RACES.some(r => r.brand === b && r.canal === (F.mode === "canal" ? 1 : 0)));
-const kfKeep = x => x.r.canal === (F.mode === "canal" ? 1 : 0) && (KF.sex === "all" || SW[x.s].sex === KF.sex) && (KF.brand === "all" || x.r.brand === KF.brand)
+const brandsFor = () => BRANDS.filter(b => RACES.some(r => r.brand === b && inMode(r)));
+const kfKeep = x => inMode(x.r) && (KF.sex === "all" || SW[x.s].sex === KF.sex) && (KF.brand === "all" || x.r.brand === KF.brand)
   && (KF.year === "all" || (KF.year[0] === "l" ? x.r.year > MAXY - +KF.year.slice(1) : x.r.year === +KF.year)) && (KF.dist === "all" || x.r.dist === +KF.dist);
 function tally(ms, keyf) {
   const m = new Map();
@@ -837,14 +844,14 @@ function renderClubs() {
 let recentN = 30;
 function renderClub(cl) {
   const mine = ALL.filter(x => x.c === cl.i);
-  const ms = medalsWhere(x => x.c === cl.i && x.r.canal === (F.mode === "canal" ? 1 : 0) && (KF.sex === "all" || SW[x.s].sex === KF.sex));
+  const ms = medalsWhere(x => x.c === cl.i && inMode(x.r) && (KF.sex === "all" || SW[x.s].sex === KF.sex));
   const all = tally(ms, () => 0)[0] || { m: [0, 0, 0], tot: 0, sw: new Set() };
   const byYear = tally(ms, x => x.r.year).sort((a, b) => b.k - a.k);
   const byEvent = tally(ms, x => x.r.brand).sort((a, b) => olympic(a, b));
   const bySw = tally(ms, x => x.s).sort((a, b) => olympic(a, b) || b.tot - a.tot);
   const recent = ms.slice().sort((a, b) => (b.x.r.date || "").localeCompare(a.x.r.date || "") || b.x.r.year - a.x.r.year || a.p - b.p);
   // events matrix: rows = events, columns = years; cell = medals (bold) and race starts (grey)
-  const starts = mine.filter(x => x.r.canal === (F.mode === "canal" ? 1 : 0) && (KF.sex === "all" || SW[x.s].sex === KF.sex));
+  const starts = mine.filter(x => inMode(x.r) && (KF.sex === "all" || SW[x.s].sex === KF.sex));
   const yrs = [...new Set(starts.map(x => x.r.year))].sort((a, b) => a - b), evs = brandsFor().filter(b => starts.some(x => x.r.brand === b));
   const cellM = new Map(), cellS = new Map(), key = (b, y) => b + "|" + y;
   for (const x of starts) for (const k of [key(x.r.brand, x.r.year), key(x.r.brand, "T"), key("T", x.r.year), key("T", "T")]) cellS.set(k, (cellS.get(k) || 0) + 1);
