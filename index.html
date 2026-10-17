@@ -1,0 +1,944 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Türkiye açık su masters yarış sonuçları, yaş grubu sıralamaları ve kulüp madalya tablosu.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%2716%27 fill=%27%230b5a7a%27/%3E%3Cpath d=%27M5 19q5.5-4 11 0t11 0M5 24q5.5-4 11 0t11 0%27 stroke=%27white%27 stroke-width=%272.4%27 fill=%27none%27/%3E%3C/svg%3E">
+<title>Açık Su Masters Veritabanı</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: top bar (home, search, rankings, races, clubs, mode, language) · ranking filters · one main area that shows
+   the ranking table, a swimmer, a comparison or a race. Desktop first; stacks on phones. */
+:root {
+  --bg: #f3f6f8; --surface: #ffffff; --ink: #0f2533; --ink-2: #4a5d6a; --ink-3: #6f808c;
+  --line: #d9e1e7; --sea: #0e5a7a; --sea-ink: #ffffff; --buoy: #e8641e; --sel: #e3eef4; --grid: #e6ecf0;
+  --gold: #b88a00; --silver: #7f8c95; --bronze: #a0592f;
+  --d1000: #2a78d6; --d2000: #eb6834; --d3000: #1baf7a; --d5000: #eda100;
+  --d6000: #e87ba4; --d10000: #008300; --d6500: #6250d6; --d4500: #e34948;
+  --pA: #2a78d6; --pB: #eb6834;
+  --display: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0b1820; --surface: #11222d; --ink: #e6eef3; --ink-2: #a9bac5; --ink-3: #8a9daa;
+  --line: #22394a; --sea: #5fb3d9; --sea-ink: #0b1820; --buoy: #f07a3a; --sel: #173445; --grid: #1a2e3b;
+  --gold: #e0b42a; --silver: #b3bfc7; --bronze: #c9825a;
+  --d1000: #3987e5; --d2000: #d95926; --d3000: #199e70; --d5000: #c98500;
+  --d6000: #d55181; --d10000: #2f9a2f; --d6500: #9085e9; --d4500: #e66767;
+  --pA: #3987e5; --pB: #d95926; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0b1820; --surface: #11222d; --ink: #e6eef3; --ink-2: #a9bac5; --ink-3: #8a9daa;
+  --line: #22394a; --sea: #5fb3d9; --sea-ink: #0b1820; --buoy: #f07a3a; --sel: #173445; --grid: #1a2e3b;
+  --gold: #e0b42a; --silver: #b3bfc7; --bronze: #c9825a;
+  --d1000: #3987e5; --d2000: #d95926; --d3000: #199e70; --d5000: #c98500;
+  --d6000: #d55181; --d10000: #2f9a2f; --d6500: #9085e9; --d4500: #e66767;
+  --pA: #3987e5; --pB: #d95926; color-scheme: dark }
+* { box-sizing: border-box }
+[hidden] { display: none !important }
+html, body { margin: 0 }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.45 }
+.wrap { max-width: 1240px; margin: 0 auto; padding-block: 0 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)) }
+button { font: inherit; color: inherit }
+:focus-visible { outline: 2px solid var(--buoy); outline-offset: 2px }
+a { color: var(--sea) }
+
+/* top bar */
+.bar { position: sticky; top: 0; z-index: 20; background: var(--bg); border-bottom: 3px solid var(--buoy);
+  display: flex; align-items: center; gap: 10px 14px; flex-wrap: wrap; padding: 10px 0 }
+.brand { display: flex; align-items: center; gap: 10px; background: none; border: 0; cursor: pointer; padding: 0;
+  text-align: left; margin-right: auto; min-width: 0 }
+.brand svg { flex: none }
+.brand b { font-family: var(--display); font-weight: 700; font-size: 19px; line-height: 1.02; text-transform: uppercase;
+  letter-spacing: .01em; display: block; max-width: 250px }
+.brand span { display: none }
+nav.links { display: flex; gap: 2px; flex-wrap: wrap }
+nav.links button, .lang button { border: 0; background: none; padding: 8px 10px; border-radius: 6px; cursor: pointer;
+  font-weight: 600; color: var(--ink-2); display: inline-flex; gap: 6px; align-items: center; min-height: 40px }
+nav.links button[aria-current=page] { color: var(--ink); background: var(--sel) }
+nav.links button:hover, .lang button:hover { color: var(--ink) }
+.search { position: relative; flex: 1 1 220px; min-width: 180px; max-width: 320px }
+.search input { width: 100%; font: 15px var(--body); color: var(--ink); background: var(--surface); border: 1px solid var(--line);
+  border-radius: 8px; padding: 9px 10px 9px 34px; min-height: 40px }
+.search > svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--ink-3); pointer-events: none }
+.sugg { position: absolute; left: 0; right: 0; top: calc(100% + 4px); background: var(--surface); border: 1px solid var(--line);
+  border-radius: 8px; box-shadow: 0 8px 24px rgb(0 0 0 / .14); list-style: none; margin: 0; padding: 4px; max-height: 360px; overflow: auto; z-index: 30 }
+.sugg li { padding: 8px 10px; border-radius: 6px; cursor: pointer; display: flex; justify-content: space-between; gap: 10px }
+.sugg li[aria-selected=true], .sugg li:hover { background: var(--sel) }
+.sugg small { color: var(--ink-3); white-space: nowrap }
+.lang { display: inline-flex; flex-shrink: 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden }
+.lang button { border-radius: 0; min-height: 34px; padding: 4px 9px; font-size: 13px }
+.lang button[aria-pressed=true] { background: var(--sea); color: var(--sea-ink) }
+
+/* filters */
+.filters { display: flex; flex-wrap: wrap; gap: 12px 18px; align-items: flex-end; padding: 14px 0 10px }
+.fld { display: flex; flex-direction: column; gap: 4px }
+.fld > span { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--ink-3) }
+.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--line); border-radius: 7px; overflow: hidden; background: var(--surface) }
+.seg button { font-weight: 600; font-size: 14px; border: 0; background: transparent; color: var(--ink-2); padding: 7px 11px;
+  cursor: pointer; min-height: 38px; font-variant-numeric: tabular-nums }
+.seg button + button { border-left: 1px solid var(--line) }
+.seg button[aria-pressed=true] { background: var(--sea); color: var(--sea-ink) }
+.seg button:disabled { opacity: .4; cursor: default }
+.agseg { flex-wrap: wrap } .agseg button { min-width: 58px }
+.rankgrid { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 18px; align-items: start }
+.agside { position: sticky; top: 76px; display: flex; flex-direction: column; gap: 6px; max-height: calc(100vh - 92px); overflow-y: auto }
+.aglab { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--ink-3) }
+.seg.vert { display: flex; flex-direction: column; border-radius: 8px }
+.seg.vert button { width: 100%; text-align: left; padding: 7px 12px; min-height: 34px; border-radius: 0 }
+.seg.vert button + button { border-left: 0; border-top: 1px solid var(--line) }
+@media (min-width: 761px) { #agFld { display: none } }
+@media (max-width: 760px) { .rankgrid { display: block } .agside { display: none } .fsheet .agseg { display: grid; grid-template-columns: repeat(4, 1fr) } .fsheet .agseg button { border: 0; box-shadow: inset 0 0 0 .5px var(--line) } }
+
+#filterBar.locked .filters, #filterBar.locked .fsum, .seg.mode.locked { opacity: .45; pointer-events: none }
+#filterBar.locked select { cursor: default }
+.lockmsg { display: none; font-size: 12px; color: var(--ink-3); margin: 2px 0 6px }
+#filterBar.locked .lockmsg { display: block }
+.bar .mode button { white-space: nowrap; font-size: 14px; padding: 6px 11px; min-height: 36px }
+.fsum, .sheethead, .sheetbg, .brand .ts { display: none }
+footer summary { cursor: pointer; font-weight: 600; color: var(--sea); padding: 6px 0 }
+footer details > div { margin-top: 6px }
+.heat th:nth-child(2), .heat td:nth-child(2) { position: sticky; left: 0; background: var(--surface); z-index: 1; min-width: 130px }
+.matrix th:first-child, .matrix td:first-child { position: sticky; left: 0; background: var(--surface); z-index: 1 }
+td .sm, .rank .cr { display: none }
+@media (min-width: 761px) { .bar { flex-wrap: nowrap } .search { min-width: 140px } nav.links { flex-wrap: nowrap } nav.links button { padding: 8px 8px; white-space: nowrap } }
+.mc { display: inline-flex; gap: 8px; justify-content: flex-end; font-variant-numeric: tabular-nums; font-weight: 600 }
+.mc span { display: inline-flex; align-items: center; gap: 3px }
+.mc i { width: 10px; height: 10px; border-radius: 50% }
+.mc .m1 { background: var(--gold) } .mc .m2 { background: var(--silver) } .mc .m3 { background: var(--bronze) }
+tr.me td { background: color-mix(in srgb, var(--buoy) 14%, transparent) }
+.stat.link { cursor: pointer } .stat.link:hover { background: var(--sel) }
+select { font: 15px var(--body); color: var(--ink); background: var(--surface); border: 1px solid var(--line);
+  border-radius: 7px; padding: 7px 9px; min-height: 38px }
+.hint { color: var(--ink-2); font-size: 14px; margin: 0 0 12px }
+.hint b { color: var(--ink) }
+
+/* panels and tables */
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px }
+.panel + .panel { margin-top: 16px }
+.phead { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: baseline; justify-content: space-between; padding: 14px 16px 8px }
+.phead h2, .phead h3 { margin: 0; font-family: var(--display); font-weight: 600; font-size: 22px; letter-spacing: .01em }
+.phead h3 { font-size: 19px }
+.sub { color: var(--ink-3); font-size: 13px }
+.tablewrap { overflow-x: auto }
+table { border-collapse: collapse; width: 100%; font-size: 14px }
+th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3); font-weight: 700;
+  padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; background: var(--surface) }
+td { padding: 8px 10px; border-bottom: 1px solid var(--grid); vertical-align: middle }
+tr:last-child td { border-bottom: 0 }
+.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap }
+.mono { font-family: var(--mono); font-size: 13px }
+tbody tr.go { cursor: pointer }
+tbody tr.go:hover { background: var(--sel) }
+tr.out td { color: var(--ink-3) }
+.who { font-weight: 600 }
+.clubs { color: var(--ink-2); font-size: 13px }
+.pct { display: inline-flex; align-items: center; gap: 8px; justify-content: flex-end }
+.meter { width: 64px; height: 6px; background: var(--grid); border-radius: 3px; position: relative; overflow: hidden }
+.meter i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--sea); border-radius: 3px }
+.empty { padding: 28px 16px; color: var(--ink-2) }
+.more { display: block; margin: 0 auto 14px; border: 1px solid var(--line); background: var(--surface); border-radius: 7px;
+  padding: 8px 14px; cursor: pointer; font-weight: 600 }
+.back { border: 0; background: none; color: var(--sea); font-weight: 600; cursor: pointer; padding: 6px 0; display: inline-flex; gap: 6px; align-items: center }
+
+/* swimmer */
+.prof { padding: 16px }
+.ptop { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: flex-start; justify-content: space-between }
+.pname { font-family: var(--display); font-size: 34px; font-weight: 700; line-height: 1.05; margin: 0; text-wrap: balance }
+.meta { color: var(--ink-2); margin-top: 4px; font-size: 14px }
+.btn { border: 1px solid var(--line); background: var(--surface); border-radius: 7px; padding: 8px 12px; cursor: pointer; font-weight: 600;
+  display: inline-flex; gap: 6px; align-items: center; min-height: 40px }
+.btn.primary { background: var(--sea); border-color: var(--sea); color: var(--sea-ink) }
+.strip { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 16px }
+.stat { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; border-top: 4px solid var(--c, var(--line)) }
+.stat .k { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-2) }
+.stat .v { font-family: var(--display); font-size: 26px; font-weight: 600; line-height: 1.1; font-variant-numeric: tabular-nums }
+.stat .s { font-size: 12.5px; color: var(--ink-3) }
+.chartbox { position: relative; padding: 4px 8px 8px }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible }
+.chart .ax { font: 12px var(--body); fill: var(--ink-3) }
+.chart .gl { stroke: var(--grid) }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; padding: 0 16px 6px; font-size: 13px; color: var(--ink-2) }
+.legend span { display: inline-flex; align-items: center; gap: 6px }
+.legend i { width: 14px; height: 3px; border-radius: 2px; background: var(--c) }
+.tip { position: absolute; pointer-events: none; background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+  box-shadow: 0 6px 18px rgb(0 0 0 / .16); padding: 8px 10px; font-size: 13px; max-width: 280px; z-index: 10; display: none }
+.tip b { display: block; margin-bottom: 2px }
+.medal { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; font-size: 10px; font-weight: 700;
+  color: #fff; vertical-align: -3px; margin-left: 4px }
+.m1 { background: var(--gold) } .m2 { background: var(--silver) } .m3 { background: var(--bronze) }
+.dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--c); margin-right: 6px }
+
+/* compare */
+.cmpgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 16px }
+.slot { border: 1px solid var(--line); border-radius: 8px; padding: 12px; border-top: 4px solid var(--c) }
+.slot .search { flex: none; min-width: 0 }
+.slot h3 { margin: 10px 0 2px; font-family: var(--display); font-size: 24px; line-height: 1.1 }
+.rivals { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px }
+.chip { border: 1px solid var(--line); background: var(--bg); border-radius: 999px; padding: 4px 10px; font-size: 13px; cursor: pointer }
+.radarwrap { display: grid; grid-template-columns: minmax(280px, 460px) 1fr; gap: 12px 24px; padding: 0 16px 16px; align-items: start }
+.radar svg { width: 100%; height: auto; display: block; overflow: visible }
+.radar .ax { font: 600 12.5px var(--body); fill: var(--ink-2) }
+.radar .rl { font: 11px var(--body); fill: var(--ink-3) }
+.win { font-weight: 700 }
+
+/* races picker */
+.picker { display: grid; grid-template-columns: 170px 240px 1fr; gap: 16px; align-items: start }
+.picker > * { min-width: 0 } .picker > .panel, .picker .panel:first-child { margin-top: 0 }
+.plist { display: flex; flex-direction: column; gap: 2px; padding: 6px }
+.plist button { display: flex; justify-content: space-between; gap: 8px; border: 0; background: none; padding: 9px 10px; border-radius: 7px;
+  cursor: pointer; text-align: left; font-weight: 600; color: var(--ink-2); min-height: 40px; align-items: center }
+.plist button:hover { background: var(--sel); color: var(--ink) }
+.plist button[aria-current=true] { background: var(--sea); color: var(--sea-ink) }
+.plist button small { font-weight: 400; opacity: .8; white-space: nowrap }
+.plabel { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--ink-3); padding: 10px 12px 2px }
+.ctrls { display: flex; flex-wrap: wrap; gap: 12px 18px; align-items: flex-end; padding: 0 16px 12px }
+.agh { margin: 0; padding: 12px 16px 4px; font-family: var(--display); font-size: 18px; border-top: 1px solid var(--line) }
+.matrix td.num, .matrix th.num { min-width: 52px }
+.matrix td.h { background: color-mix(in srgb, var(--gold) var(--a), transparent) }
+.matrix td b { font-size: 15px } .matrix td .sub { margin-left: 4px }
+.matrix tr.tot td { border-top: 2px solid var(--line); font-weight: 700 }
+
+/* clubs */
+.mh { display: inline-flex; align-items: center; gap: 5px; justify-content: flex-end }
+.mh .medal { margin: 0 }
+td.cnt { font-weight: 700 }
+td.zero { color: var(--ink-3); font-weight: 400 }
+.heat td.num { min-width: 46px }
+.heat td.h { background: color-mix(in srgb, var(--sea) var(--a), transparent) }
+.heat th.num { text-align: right }
+.clubf { display: flex; flex-wrap: wrap; gap: 12px 18px; align-items: flex-end; margin: 0 0 14px }
+a.clink { color: inherit; text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; align-items: start }
+.two .panel { margin: 0 }
+a.clink:hover { text-decoration-color: currentColor }
+
+footer { margin-top: 24px; color: var(--ink-2); font-size: 13px; max-width: 86ch; display: grid; gap: 6px }
+
+@media (max-width: 760px) {
+  body { padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)) }
+  .bar { gap: 8px 10px; padding: 8px 0 }
+  .brand { order: 1 } .bar .mode { order: 2 } .search { flex: 1 1 220px; order: 3; max-width: none; min-width: 0 } .lang { order: 4 }
+  .brand svg { width: 28px; height: 28px }
+  .brand .tl { display: none } .brand .ts { display: block; font-size: 17px; max-width: 120px }
+  .mh .lbl { display: none }
+  /* rankings as cards: rank | name + club | percentile + medals */
+  .rank thead { display: none }
+  .rank tbody tr { display: grid; grid-template-columns: 34px 1fr auto; grid-template-areas: "n w p" "n c m"; gap: 2px 10px;
+    padding: 10px 12px; border-bottom: 1px solid var(--grid); align-items: center }
+  .rank tbody tr:last-child { border-bottom: 0 }
+  .rank td { display: none; padding: 0; border: 0 }
+  .rank td.c-n { display: block; grid-area: n; font-family: var(--display); font-size: 20px; font-weight: 600; text-align: center; color: var(--ink-2) }
+  .rank td.c-w { display: block; grid-area: w; min-width: 0 }
+  .rank td.c-c { display: block !important; grid-area: c; font-size: 12.5px; color: var(--ink-3); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+  .rank .cr { display: inline }
+  .rank td.c-p { display: block; grid-area: p; font-weight: 700 }
+  .rank td.c-m { display: block; grid-area: m; font-size: 13px }
+  td .sm { display: block; font-size: 12.5px; color: var(--ink-3) }
+  .ctrls .seg button { padding: 6px 9px }
+  .ctrls { padding: 0 12px 10px; gap: 10px 12px }
+  .bar .mode button { padding: 5px 8px; font-size: 13px; min-height: 34px }
+  /* bottom tab bar */
+  nav.links { position: fixed; left: 0; right: 0; bottom: 0; z-index: 35; background: var(--surface); border-top: 1px solid var(--line);
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; padding: 4px 4px calc(4px + env(safe-area-inset-bottom, 0px)) }
+  nav.links button { flex-direction: column; gap: 2px; font-size: 11.5px; padding: 6px 2px; min-height: 52px; justify-content: center }
+  nav.links button svg { width: 20px; height: 20px }
+  nav.links button[aria-current=page] { background: none; color: var(--sea) }
+  /* filter summary + bottom sheet */
+  .fsum { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 10px; margin: 10px 0 8px; padding: 10px 12px;
+    border: 1px solid var(--line); border-radius: 10px; background: var(--surface); font-weight: 600; text-align: left; cursor: pointer; min-height: 46px }
+  .fsum small { color: var(--sea); font-weight: 700; white-space: nowrap }
+  .fsheet { display: none !important }
+  .sheetwrap.open .fsheet { display: flex !important; position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; background: var(--surface);
+    border-radius: 16px 16px 0 0; box-shadow: 0 -10px 30px rgb(0 0 0 / .25); padding: 14px 16px calc(18px + env(safe-area-inset-bottom, 0px));
+    max-height: 85vh; overflow: auto; flex-direction: column; align-items: stretch; gap: 14px }
+  .sheetwrap.open .sheetbg { display: block; position: fixed; inset: 0; background: rgb(0 0 0 / .4); z-index: 45 }
+  .sheetwrap.open .sheethead { display: flex; justify-content: space-between; align-items: center; font-family: var(--display); font-size: 20px }
+  .fsheet .seg { display: flex } .fsheet .seg button { flex: 1 } .fsheet select { width: 100% }
+  .two { grid-template-columns: 1fr }
+  .picker { grid-template-columns: 1fr; gap: 10px }
+  .plist { flex-direction: row; overflow-x: auto; gap: 6px; padding: 8px }
+  .plist button { flex: none; border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; min-height: 38px }
+  .plabel { display: none }
+  .pname { font-size: 28px }
+  .hide-sm { display: none }
+  .meter { display: none }
+  td, th { padding: 7px 6px }
+  th { white-space: normal }
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="bar">
+    <button class="brand" id="home" type="button" aria-label="Home">
+      <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="16" fill="var(--sea)"/>
+        <path d="M5 19c3 0 3-2.5 6-2.5s3 2.5 6 2.5 3-2.5 6-2.5 3 2.5 6 2.5M5 24c3 0 3-2.5 6-2.5s3 2.5 6 2.5 3-2.5 6-2.5 3 2.5 6 2.5" stroke="var(--surface)" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <circle cx="17" cy="10.5" r="3.2" fill="var(--buoy)"/></svg>
+      <div><b class="tl" data-t="title"></b><b class="ts" data-t="titleShort"></b><span data-t="tagline"></span></div>
+    </button>
+    <div class="search" id="topSearch"></div>
+    <nav class="links" aria-label="Sections">
+      <button type="button" data-nav="rank"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 14V9h3v5M6.5 14V4h3v10M11 14V7h3v7" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><span class="lbl" data-t="navRank"></span></button>
+      <button type="button" data-nav="races"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="3" width="12" height="11" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M2 6.5h12M5 1.5v3M11 1.5v3" stroke="currentColor" stroke-width="1.5"/></svg><span class="lbl" data-t="navRaces"></span></button>
+      <button type="button" data-nav="clubs"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="10" r="4.2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M5 1.5 8 5.6 11 1.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg><span class="lbl" data-t="navClubs"></span></button>
+    </nav>
+    <div class="seg mode" id="fMode" role="group"></div>
+    <div class="lang" role="group" aria-label="Language"><button type="button" data-lang="tr">TR</button><button type="button" data-lang="en">EN</button><button type="button" data-lang="ru">RU</button></div>
+  </header>
+
+  <section id="filterBar" class="sheetwrap">
+    <button type="button" class="fsum" id="fSum" aria-expanded="false" aria-controls="fSheet"></button>
+    <div class="sheetbg" id="sheetBg"></div>
+    <div class="filters fsheet" id="fSheet">
+      <div class="sheethead"><b data-t="filters"></b><button type="button" class="btn primary" id="fDone" data-t="done"></button></div>
+      <div class="fld"><span data-t="sex"></span><div class="seg" id="fSex" role="group"></div></div>
+      <div class="fld" id="agFld"><span data-t="ageGroup"></span><div class="seg agseg" id="fAg" role="group"></div></div>
+      <div class="fld"><span data-t="distance"></span><div class="seg" id="fDist" role="group"></div></div>
+      <div class="fld" id="suitFld"><span data-t="suit"></span><div class="seg" id="fWet" role="group"></div></div>
+      <div class="fld"><span data-t="years"></span><div class="seg" id="fYears" role="group"></div></div>
+    </div>
+    <div class="lockmsg" data-t="filtersLocked"></div>
+  </section>
+
+  <main id="main" aria-live="polite"></main>
+
+  <footer>
+    <details><summary data-t="method"></summary>
+      <div data-t="foot1"></div>
+      <div data-t="foot2"></div></details>
+    <div id="coverage"></div>
+  </footer>
+</div>
+<div class="tip" id="tip" role="tooltip"></div>
+
+<script>
+(async () => {
+"use strict";
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const store = { get(k, d) { try { const v = localStorage.getItem("tow:" + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+                set(k, v) { try { localStorage.setItem("tow:" + k, JSON.stringify(v)); } catch {} } };
+
+const T = {
+  tr: {
+    title: "Türkiye Açık Su Masters Yüzücü Veritabanı", titleShort: "Açık Su Masters", method: "Yöntem ve kaynaklar", tagline: "Yaş grubu sıralamaları, yüzücü istatistikleri ve karşılaştırma",
+    navRank: "Sıralama", navCompare: "Karşılaştır", navRaces: "Yarışlar", searchPh: "Yüzücü ara…",
+    open: "Açık su", canal: "Boğaz geçişleri", sex: "Cinsiyet", F: "Kadın", M: "Erkek", ageGroup: "Yaş grubu", distance: "Mesafe",
+    suit: "Kıyafet", skin: "Mayolu", wet: "Neopren", years: "Yıllar", allYears: "Tümü", last3: "Son 3 yıl", lastN: n => `Son ${n} yıl`, show: "Göster",
+    topN: p => `İlk %${p}`, everyone: "Herkes", filters: "Filtreler", done: "Tamam", change: "Değiştir",
+    colMedals: "Madalya (YG)", inCat: "Bu kategoride", notInCat: "Bu kategoride yarışı yok", showInRank: "sıralamada göster", unreadable: "İsmi okunamayan yüzücü", yearsWord: "yıl", classification: "Klasman", filtersLocked: "Yüzücü sayfasında filtreler kapalı. Değiştirmek için sıralamaya dönün.",
+    rankHint: (n, r) => `Bu grupta <b>${r}</b> yarışta <b>${n}</b> yüzücü. Madalya: bu yarışlarda yaş grubu ilk 3.`,
+    colRank: "#", colName: "Yüzücü", colClub: "Kulüp", colRaces: "Yarış", colAvg: "Gruptaki yüzdelik", colBest: "En iyi", colLast: "Son yarış",
+    noRows: "Bu seçim için sonuç yok. Yılları ya da yüzdelik sınırını genişletmeyi deneyin.",
+    moreRows: n => `${n} kişi daha göster`, backRank: "Sıralamaya dön",
+    races: "yarış", race: "yarış", totalRaces: "Toplam yarış", best: "en iyi", top: p => `ilk %${p}`,
+    pace: "Tempo", percentile: "Yüzdelik", paceAxis: "dk/100 m (yukarısı daha hızlı)", pctAxis: "yaş grubu yüzdeliği (yukarısı daha iyi)",
+    historyH: "Yıllara göre", raceListH: "Tüm yarışlar", colDate: "Tarih", colRace: "Yarış", colDist: "Mesafe", colTime: "Süre",
+    colPace: "Tempo", colAgPct: "Yaş grubu", colAllPct: "Genel", ageGroups: "Yaş grupları", clubs: "Kulüpler",
+    compareBtn: "Karşılaştır", cmpTitle: "Yüzücü karşılaştırma", cmpPick: "İkinci yüzücüyü seçin", rivals: "Sık karşılaştığı rakipler",
+    attendance: "Katılım", radarNote: "Dış halka daha iyi: yaş grubu yüzdeliği (ilk %0 = dış kenar). Katılım: yarış sayısı, en çok yarışana göre.",
+    perDist: "Mesafe bazında", headToHead: "Ortak yarışlar", ahead: (a, n) => `${a}, ${n} ortak yarışta öndeydi`, noShared: "Ortak yarış yok.",
+    allRaces: "Tüm yarışlar", finishers: "bitiren", place: "Sıra", agPlace: "YG sırası", dnf: "Bitirmedi",
+    foot1: "Sıralamadaki yüzdelik, yüzücünün seçili filtredeki (cinsiyet, yaş grubu, mesafe, kıyafet, yıllar) sırasıdır: sıra ÷ yüzücü sayısı; birinci en küçük değeri, sonuncu %100’ü alır. Sıra, aşağıdaki yarış puanına göre belirlenir. Yarış yüzdeliği: bir yüzücünün sahadaki yeri, (sıra − 0,5) ÷ bitiren sayısı. 10 kişide 1. olmak ilk %5 demektir. Yarışlar arası puan, saha büyüklüğüne göre ağırlıklı ortalamadır (√bitiren): kalabalık bir yaş grubundaki sonuç, iki kişilik bir gruptakinden daha çok sayılır. Ortalamaya ayrıca bir “orta sıra” sonucu (4 kişide %50) eklenir; böylece tek bir şanslı yarış, uzun ve istikrarlı bir geçmişin önüne geçemez.",
+    foot2: "Neopren ve mayolu kategoriler aynı yarışta ayrı yarış sayılır. Sıralar süreden yeniden hesaplanır. Yaş grupları organizatörün yayımladığı gibidir. 1, 2, 3, 5, 6 ve 10 km dışındaki yarışlar, Boğaziçi ve Çanakkale geçişleri hariç, dahil edilmedi. Boğaziçi 2026 soyadları gizli yayımlandığı için o yarış diğer yarışlarla eşleştirilmedi.",
+    coverage: (r, s) => `${r} yarış, ${s} yüzücü. Kaynak: organizatörlerin yayımladığı sonuç dosyaları.`,
+    km: d => d === 6500 ? "Boğaziçi" : d === 4500 ? "Çanakkale" : `${d / 1000} km`,
+    navClubs: "Kulüpler", byYears: "Yıllara göre", byEvents: "Etkinliklere göre", eventsWord: "etkinlik", racesWord: "yarış", classAll: "Genel klasman", classAg: "Yaş grupları", backRaces: "Yarışlara dön", matrixH: "Etkinlikler (yıl × etkinlik)", matrixNote: "Kalın: madalya · gri: yarış katılımı", starts: "katılım", moreClubs: n => `${n} kulüp daha göster`, moreMed: n => `${n} madalya daha göster`, clubTable: "Kulüp madalya tablosu", medalType: "Madalya", mSex: "Genel (K/E ilk 3)", mAg: "Yaş grubu ilk 3",
+    series: "Etkinlik", all: "Tümü", both: "Tümü", gold: "Altın", silver: "Gümüş", bronze: "Bronz", total: "Toplam",
+    medalists: "Madalyalı yüzücü", viewAs: "Görünüm", vTable: "Madalya tablosu", vYear: "Yıllara göre", vEvent: "Etkinliklere göre",
+    clubHint: (n, m) => `<b>${n}</b> kulüp, toplam <b>${m}</b> madalya. Sıralama olimpiyat usulü: önce altın, sonra gümüş, sonra bronz.`,
+    heatHint: "Hücreler toplam madalya sayısı; üzerine gelince altın / gümüş / bronz dağılımı görünür.",
+    noMedals: "Bu seçim için madalya yok.", noClubData: "Boğaziçi ve Çanakkale sonuç dosyalarında kulüp bilgisi yok, bu yüzden boğaz geçişleri için kulüp tablosu boş. Açık su sekmesine geçin.", backClubs: "Kulüplere dön", byYear: "Yıllara göre", byEvent: "Etkinliklere göre",
+    clubMeta: (sw, st) => `${sw} yüzücü · ${st} yarış katılımı`, year: "Yıl", colSwim: "Yüzücü", recent: "Madalyalar",
+    clubFoot: "Madalya, sonucun yayımlandığı yarıştaki kulübe yazılır. Benzer yazılan kulüp adları tek kulüpte birleştirildi; “Ferdi” sayılmaz. Neopren ve mayolu kategoriler ayrı yarış olduğu için ayrı madalya verir.",
+  },
+  en: {
+    title: "Turkish Open Water Masters Swimmers Database", titleShort: "Open Water Masters", method: "Method and sources", tagline: "Age-group rankings, swimmer stats and head-to-head",
+    navRank: "Rankings", navCompare: "Compare", navRaces: "Races", searchPh: "Search swimmers…",
+    open: "Open water", canal: "Strait crossings", sex: "Sex", F: "Women", M: "Men", ageGroup: "Age group", distance: "Distance",
+    suit: "Suit", skin: "No wetsuit", wet: "Wetsuit", years: "Years", allYears: "All", last3: "Last 3 years", lastN: n => n === 1 ? "Last year" : `Last ${n} years`, show: "Show",
+    topN: p => `Top ${p}%`, everyone: "Everyone", filters: "Filters", done: "Done", change: "Change",
+    colMedals: "Medals (AG)", inCat: "In this category", notInCat: "No races in this category", showInRank: "show in rankings", unreadable: "Unreadable name", yearsWord: "years", classification: "Classification", filtersLocked: "Filters are off on a swimmer page. Go back to the rankings to change them.",
+    rankHint: (n, r) => `<b>${n}</b> swimmers across <b>${r}</b> races in this group. Medals: age-group top 3 in these races.`,
+    colRank: "#", colName: "Swimmer", colClub: "Club", colRaces: "Races", colAvg: "Percentile in group", colBest: "Best", colLast: "Last race",
+    noRows: "No results for this selection. Try widening the years or the percentile cut-off.",
+    moreRows: n => `Show ${n} more`, backRank: "Back to rankings",
+    races: "races", race: "race", totalRaces: "Total races", best: "best", top: p => `top ${p}%`,
+    pace: "Pace", percentile: "Percentile", paceAxis: "min/100 m (higher is faster)", pctAxis: "age-group percentile (higher is better)",
+    historyH: "By year", raceListH: "All races", colDate: "Date", colRace: "Race", colDist: "Distance", colTime: "Time",
+    colPace: "Pace", colAgPct: "Age group", colAllPct: "Overall", ageGroups: "Age groups", clubs: "Clubs",
+    compareBtn: "Compare", cmpTitle: "Swimmer comparison", cmpPick: "Pick a second swimmer", rivals: "Frequent rivals",
+    attendance: "Attendance", radarNote: "Outer ring is better: age-group percentile (top 0% = outer edge). Attendance: races swum, relative to whoever swam more.",
+    perDist: "By distance", headToHead: "Shared races", ahead: (a, n) => `${a} finished ahead in ${n} shared races`, noShared: "No shared races.",
+    allRaces: "All races", finishers: "finishers", place: "Place", agPlace: "AG place", dnf: "Did not finish",
+    foot1: "The percentile in the rankings is the swimmer's position in the selected filter (sex, age group, distance, suit, years): rank ÷ number of swimmers, so first gets the smallest value and last gets 100%. The order comes from the race rating below. Race percentile: where a swimmer finished in the field, (place − 0.5) ÷ finishers. 1st of 10 is top 5%. The rating across races is a field-size-weighted average (√finishers), so a result in a big age group counts more than one in a group of two. One mid-field result (top 50% in a field of 4) is mixed in, so a single lucky swim can't outrank a long, consistent record.",
+    foot2: "Wetsuit and no-wetsuit categories in one race are separate races. Places are recomputed from times. Age groups are as each organiser published them. Races at distances other than 1, 2, 3, 5, 6 and 10 km are left out, except the Boğaziçi and Çanakkale crossings. Boğaziçi 2026 printed surnames masked, so that race isn't linked to other races.",
+    coverage: (r, s) => `${r} races, ${s} swimmers. Source: organisers' published result files.`,
+    km: d => d === 6500 ? "Boğaziçi" : d === 4500 ? "Çanakkale" : `${d / 1000} km`,
+    navClubs: "Clubs", byYears: "By year", byEvents: "By event", eventsWord: "events", racesWord: "races", classAll: "Overall", classAg: "Age groups", backRaces: "Back to races", matrixH: "Events (year × event)", matrixNote: "Bold: medals · grey: race starts", starts: "starts", moreClubs: n => `Show ${n} more`, moreMed: n => `Show ${n} more`, clubTable: "Club medal table", medalType: "Medals", mSex: "Overall (W/M top 3)", mAg: "Age-group top 3",
+    series: "Event", all: "All", both: "All", gold: "Gold", silver: "Silver", bronze: "Bronze", total: "Total",
+    medalists: "Medallists", viewAs: "View", vTable: "Medal table", vYear: "By year", vEvent: "By event",
+    clubHint: (n, m) => `<b>${n}</b> clubs, <b>${m}</b> medals in all. Ranked Olympic-style: gold first, then silver, then bronze.`,
+    heatHint: "Cells show total medals; hover for the gold / silver / bronze split.",
+    noMedals: "No medals for this selection.", noClubData: "The Boğaziçi and Çanakkale result files list no clubs, so there is no club table for strait crossings. Switch to Open water.", backClubs: "Back to clubs", byYear: "By year", byEvent: "By event",
+    clubMeta: (sw, st) => `${sw} swimmers · ${st} race starts`, year: "Year", colSwim: "Swimmer", recent: "Medals",
+    clubFoot: "A medal goes to the club the swimmer was listed under in that race. Similar spellings of a club name are merged into one club; “Ferdi” (unattached) isn't counted. Wetsuit and no-wetsuit categories are separate races, so each awards its own medals.",
+  },
+  ru: {
+    title: "База пловцов-мастерс Турции", titleShort: "Пловцы-мастерс", method: "Методика и источники", tagline: "Рейтинги по возрастным группам, статистика пловцов",
+    navRank: "Рейтинг", navCompare: "Сравнение", navRaces: "Заплывы", searchPh: "Поиск пловца…",
+    open: "Открытая вода", canal: "Проливы", sex: "Пол", F: "Женщины", M: "Мужчины", ageGroup: "Возрастная группа", distance: "Дистанция",
+    suit: "Костюм", skin: "Без гидрокостюма", wet: "В гидрокостюме", years: "Годы", allYears: "Все", last3: "Последние 3 года", lastN: n => n === 1 ? "Последний год" : `Последние ${n} года`, show: "Показать",
+    topN: p => `Лучшие ${p}%`, everyone: "Все", filters: "Фильтры", done: "Готово", change: "Изменить",
+    colMedals: "Медали (ВГ)", inCat: "В этой категории", notInCat: "Нет заплывов в этой категории", showInRank: "показать в рейтинге", filtersLocked: "На странице пловца фильтры отключены. Чтобы изменить их, вернитесь к рейтингу.",
+    rankHint: (n, r) => `<b>${n}</b> пловцов в <b>${r}</b> заплывах этой группы. Медали: топ-3 возрастной группы в этих заплывах.`,
+    colRank: "#", colName: "Пловец", colClub: "Клуб", colRaces: "Заплывы", colAvg: "Процентиль в группе", colBest: "Лучший", colLast: "Последний заплыв",
+    noRows: "Нет результатов для этого выбора. Попробуйте расширить диапазон лет.",
+    moreRows: n => `Показать ещё ${n}`, backRank: "Назад к рейтингу",
+    races: "заплывов", race: "заплыв", totalRaces: "Всего заплывов", best: "лучший", top: p => `топ ${p}%`,
+    pace: "Темп", percentile: "Процентиль", paceAxis: "мин/100 м (выше — быстрее)", pctAxis: "процентиль в возрастной группе (выше — лучше)",
+    historyH: "По годам", raceListH: "Все заплывы", colDate: "Дата", colRace: "Заплыв", colDist: "Дистанция", colTime: "Время",
+    colPace: "Темп", colAgPct: "Возр. группа", colAllPct: "Абсолют", ageGroups: "Возрастные группы", clubs: "Клубы",
+    compareBtn: "Сравнить", cmpTitle: "Сравнение пловцов", cmpPick: "Выберите второго пловца", rivals: "Частые соперники",
+    attendance: "Участие", radarNote: "",
+    perDist: "По дистанциям", headToHead: "Общие заплывы", ahead: (a, n) => `${a} финишировал(а) впереди в ${n} общих заплывах`, noShared: "Общих заплывов нет.",
+    allRaces: "Все заплывы", finishers: "финишировавших", place: "Место", agPlace: "Место в ВГ", dnf: "Не финишировал(а)",
+    foot1: "Процентиль в рейтинге — это позиция пловца внутри выбранного фильтра (пол, возрастная группа, дистанция, костюм, годы): место ÷ число пловцов, поэтому у первого наименьшее значение, у последнего ровно 100%. Порядок задаёт рейтинг по заплывам. Процентиль заплыва: (место − 0,5) ÷ число финишировавших; 1-е место из 10 — топ 5%. Рейтинг по нескольким заплывам — среднее, взвешенное по размеру группы (√финишировавших), поэтому результат в большой группе весит больше, чем в группе из двух. Добавляется один средний результат (топ 50% в группе из 4), чтобы один удачный заплыв не обгонял долгую стабильную историю.",
+    foot2: "Категории с гидрокостюмом и без него в одном заплыве считаются разными заплывами. Места пересчитаны по времени. Возрастные группы — как их опубликовал организатор. Дистанции кроме 1, 2, 3, 5, 6 и 10 км не учитываются, за исключением переплывов Босфора и Дарданелл. В 2026 году Boğaziçi скрыл фамилии, поэтому тот заплыв не связан с другими.",
+    coverage: (r, s) => `${r} заплывов, ${s} пловцов. Источник: протоколы организаторов.`,
+    km: d => d === 6500 ? "Босфор" : d === 4500 ? "Дарданеллы" : `${d / 1000} км`,
+    navClubs: "Клубы", byYears: "По годам", byEvents: "По соревнованиям", eventsWord: "соревнований", racesWord: "заплывов", classAll: "Абсолют", classAg: "Возрастные группы", backRaces: "Назад к заплывам", matrixH: "Соревнования (год × соревнование)", matrixNote: "Жирным: медали · серым: старты", starts: "стартов", moreClubs: n => `Показать ещё ${n}`, moreMed: n => `Показать ещё ${n}`, clubTable: "Медальный зачёт клубов", medalType: "Медали", mSex: "Абсолют (Ж/М топ-3)", mAg: "Топ-3 возрастной группы",
+    series: "Соревнование", all: "Все", both: "Все", gold: "Золото", silver: "Серебро", bronze: "Бронза", total: "Всего",
+    medalists: "Призёры", viewAs: "Вид", vTable: "Медальный зачёт", vYear: "По годам", vEvent: "По соревнованиям",
+    clubHint: (n, m) => `<b>${n}</b> клубов, всего <b>${m}</b> медалей. Порядок как на Олимпиаде: сначала золото, потом серебро, потом бронза.`,
+    heatHint: "В ячейках — всего медалей; наведите, чтобы увидеть золото / серебро / бронзу.",
+    noMedals: "Нет медалей для этого выбора.", noClubData: "В протоколах Босфора и Дарданелл нет клубов, поэтому для переплывов проливов зачёта клубов нет. Переключитесь на «Открытая вода».", backClubs: "Назад к клубам", byYear: "По годам", byEvent: "По соревнованиям",
+    clubMeta: (sw, st) => `${sw} пловцов · ${st} стартов`, year: "Год", colSwim: "Пловец", recent: "Медали",
+    clubFoot: "Медаль засчитывается клубу, за который пловец был заявлен в этом заплыве. Похожие написания названия клуба объединены; «Ferdi» (без клуба) не учитывается. Категории с гидрокостюмом и без него — разные заплывы, в каждой свои медали.",
+    unreadable: "Имя не распознано", yearsWord: "лет", classification: "Классификация",
+  },
+};
+let lang = store.get("lang", "tr"); if (!T[lang]) lang = "tr";
+const t = (k, ...a) => { const v = T[lang][k]; return typeof v === "function" ? v(...a) : v; };
+
+const D = await (await fetch("data.json")).json();
+const RACES = D.races.map(([brand, year, stage, date, dist, wet, canal], i) => ({ i, brand, year, stage, date, dist, wet, canal }));
+// unnamed = 1: the result file had a club or heading where the name should be; the swim still counts for places
+// "AHMET YILMAZ" / "ahmet yılmaz" -> "Ahmet Yılmaz"; words already in mixed case ("McDonald") are kept
+const tc = n => String(n).split(/(\s+)/).map(w => w === w.toLocaleUpperCase("tr") || w === w.toLocaleLowerCase("tr")
+  ? w.toLocaleLowerCase("tr").replace(/(^|[.\-'’(])(\p{L})/gu, (m, a, b) => a + b.toLocaleUpperCase("tr")) : w).join("");
+const SW = D.swimmers.map(([name, sex, clubs, variants, unnamed = 0], i) => ({ i, name: unnamed ? t("unreadable") : tc(name), sex, clubs, variants: variants.map(tc), unnamed, res: [] }));
+const CLUBS = (D.clubs || []).map((name, i) => ({ i, name }));
+const ALL = D.results.map(([s, r, ag, time, st, ps, ns, pa, na, c = -1]) => {
+  const x = { s, r: RACES[r], ag, time, st, ps, ns, pa, na, c,
+    pctS: ps ? (ps - .5) / ns * 100 : null, pctA: pa ? (pa - .5) / na * 100 : null };
+  SW[s].res.push(x);
+  return x;
+});
+SW.forEach(s => s.res.sort((a, b) => (b.r.date || "").localeCompare(a.r.date || "") || b.r.year - a.r.year));
+const MAXY = Math.max(...RACES.map(r => r.year));
+const DISTS = { open: [1000, 2000, 3000, 5000, 6000, 10000], canal: [6500, 4500] };
+const dcol = d => `var(--d${d})`;
+const fold = s => String(s).toLocaleLowerCase("tr").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/ı/g, "i");
+SW.forEach(s => { s.key = [s.name, ...s.variants].map(fold).join(" | "); s.n = s.res.length; });
+const raceName = r => `${r.brand}${r.stage ? " " + r.stage : ""} ${r.year}`;
+const fmtT = s => { if (s == null) return "–"; s = Math.round(s); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = s % 60;
+  return (h ? h + ":" + String(m).padStart(2, "0") : m) + ":" + String(x).padStart(2, "0"); };
+const paceOf = x => x.time ? x.time / x.r.dist * 100 : null;
+const fmtP = p => { if (p == null) return "–"; const m = Math.floor(p / 60), s = Math.round(p % 60); return m + ":" + String(s === 60 ? 59 : s).padStart(2, "0"); };
+const pctTxt = p => p == null ? "–" : (p < 1 ? "<1" : Math.round(p));
+const dateTxt = r => r.date ? new Date(r.date + "T12:00").toLocaleDateString({ tr: "tr-TR", en: "en-GB", ru: "ru-RU" }[lang], { day: "numeric", month: "short", year: "numeric" }) : String(r.year);
+
+/* Rating = field-weighted, shrunk average. Each result weighs √(finishers in its age group), so a
+   2-person group counts far less than a 40-person one; then one imaginary mid-field result (top 50% in
+   a field of 4) is mixed in, so a single lucky swim can't outrank a long consistent record. */
+const PRIOR_W = Math.sqrt(4), PRIOR = 50;
+function score(list, key = "pctA", nkey = "na") {
+  let w = 0, s = 0, best = null, n = 0;
+  for (const x of list) {
+    // races with no published age groups (Çanakkale 2023–2025) fall back to the overall Kadın/Erkek percentile
+    const v = x[key] ?? (key === "pctA" ? x.pctS : null), f = x[nkey] ?? x.ns;
+    if (v == null) continue;
+    const k = Math.sqrt(f); w += k; s += k * v; n++; best = best == null ? v : Math.min(best, v);
+  }
+  return w ? { avg: (s + PRIOR_W * PRIOR) / (w + PRIOR_W), raw: s / w, best, n } : null;
+}
+const distKey = r => r.dist; // canal distances are unique (6500 Boğaziçi, 4500 Çanakkale)
+
+/* ---------- state ---------- */
+const F = Object.assign({ mode: "open", sex: "M", ag: "35-39", dist: 5000, wet: 0, years: "all", cut: 15 }, store.get("filters", {}));
+let view = { name: "rank" }, limit = 100, metric = store.get("metric", "pct"), cmpB = null;
+
+/* ---------- search (top bar and compare slots) ---------- */
+function searchBox(host, onPick, placeholderKey = "searchPh") {
+  host.innerHTML = `<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m11 11 3.5 3.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+    <input type="search" role="combobox" aria-expanded="false" aria-autocomplete="list" autocomplete="off" placeholder="${esc(t(placeholderKey))}" aria-label="${esc(t("searchPh"))}">
+    <ul class="sugg" role="listbox" hidden></ul>`;
+  const inp = host.querySelector("input"), ul = host.querySelector("ul");
+  let items = [], act = 0;
+  const close = () => { ul.hidden = true; inp.setAttribute("aria-expanded", "false"); };
+  const draw = () => {
+    ul.innerHTML = items.map((s, k) => `<li role="option" id="${host.id || "s"}-o${k}" aria-selected="${k === act}" data-k="${k}">
+      <span>${esc(s.name)}</span><small>${t(s.sex) || ""} · ${s.n} ${t("races")}</small></li>`).join("");
+    ul.hidden = !items.length; inp.setAttribute("aria-expanded", String(!!items.length));
+  };
+  inp.addEventListener("input", () => {
+    const q = fold(inp.value.trim());
+    if (q.length < 2) { items = []; close(); return; }
+    const parts = q.split(/\s+/);
+    items = SW.filter(s => !s.unnamed && parts.every(p => s.key.includes(p))).sort((a, b) => b.n - a.n).slice(0, 10);
+    act = 0; draw();
+  });
+  inp.addEventListener("keydown", e => {
+    if (ul.hidden) return;
+    if (e.key === "ArrowDown") { act = Math.min(items.length - 1, act + 1); draw(); e.preventDefault(); }
+    else if (e.key === "ArrowUp") { act = Math.max(0, act - 1); draw(); e.preventDefault(); }
+    else if (e.key === "Enter" && items[act]) { pick(items[act]); e.preventDefault(); }
+    else if (e.key === "Escape") close();
+  });
+  const pick = s => { inp.value = ""; close(); onPick(s); };
+  ul.addEventListener("mousedown", e => { const li = e.target.closest("li"); if (li) { e.preventDefault(); pick(items[+li.dataset.k]); } });
+  inp.addEventListener("blur", () => setTimeout(close, 120));
+  return inp;
+}
+
+/* ---------- filters ---------- */
+function segment(el, opts, cur, onSet) {
+  el.innerHTML = opts.map(([v, label, dis]) => `<button type="button" aria-pressed="${String(v) === String(cur)}" data-v="${v}" ${dis ? "disabled" : ""}>${label}</button>`).join("");
+  el.onclick = e => { const b = e.target.closest("button"); if (b && !b.disabled) onSet(b.dataset.v); };
+}
+function poolFor(opts = {}) {
+  const yMin = F.years === "all" ? 0 : MAXY - +F.years + 1;
+  return ALL.filter(x => x.r.canal === (F.mode === "canal" ? 1 : 0) && SW[x.s].sex === F.sex && x.r.year >= yMin
+    && (opts.anyDist || x.r.dist === +F.dist) && (F.mode === "canal" || opts.anyWet || x.r.wet === +F.wet));
+}
+const agStart = a => { const m = /(\d+)/.exec(a); return m ? +m[1] : 999; };
+let AGS = [];
+function drawFilters() {
+  segment($("#fMode"), [["open", t("open")], ["canal", t("canal")]], F.mode, v => { F.mode = v; if (!DISTS[v].includes(+F.dist)) F.dist = DISTS[v][v === "open" ? 3 : 0];
+    if (KF.dist !== "all" && !DISTS[v].includes(+KF.dist)) KF.dist = "all"; if (KF.brand !== "all" && !brandsFor().includes(KF.brand)) KF.brand = "all"; store.set("clubF", KF);
+    if (view.name === "race") { store.set("filters", F); go("#/races"); } else changed(); });
+  segment($("#fSex"), [["F", t("F")], ["M", t("M")]], F.sex, v => { F.sex = v; changed(); });
+  const hasDist = new Set(poolFor({ anyDist: true, anyWet: true }).map(x => x.r.dist));
+  segment($("#fDist"), DISTS[F.mode].map(d => [d, t("km", d), !hasDist.has(d)]), F.dist, v => { F.dist = +v; changed(); });
+  $("#suitFld").hidden = F.mode === "canal";
+  segment($("#fWet"), [[0, t("skin")], [1, t("wet")]], F.wet, v => { F.wet = +v; changed(); });
+  segment($("#fYears"), [["all", t("allYears")], ["1", t("lastN", 1)], ["2", t("lastN", 2)], ["3", t("lastN", 3)]], F.years, v => { F.years = v; changed(); });
+  const counts = {};
+  for (const x of poolFor()) if (x.ag && x.pa) counts[x.ag] = (counts[x.ag] || 0) + 1;
+  const ags = Object.keys(counts).sort((a, b) => agStart(a) - agStart(b) || a.localeCompare(b));
+  if (ags.length && !ags.includes(F.ag)) F.ag = ags.reduce((a, b) => counts[b] > counts[a] ? b : a);
+  AGS = ags;
+  // age groups as buttons (g): a wrapping row in the filter bar / phone sheet, a vertical column beside the ranking on desktop
+  segment($("#fAg"), ags.length ? ags.map(a => [a, esc(a)]) : [["", "–", true]], F.ag, v => { F.ag = v; changed(); });
+  document.body.classList.toggle("v-rank", view.name === "rank");
+  // a swimmer page shows filters for context only (g): nothing in the bar responds there
+  const lock = view.name === "swimmer";
+  $("#filterBar").classList.toggle("locked", lock); $("#fMode").classList.toggle("locked", lock);
+  $("#fSum").disabled = lock;
+  if (lock) document.querySelectorAll("#fSheet .seg button, #fMode button").forEach(b => { b.disabled = true; b.tabIndex = -1; });
+  $("#fSum").innerHTML = `<span>${[t(F.sex), F.ag, t("km", F.dist), F.mode === "canal" ? "" : (+F.wet ? t("wet") : t("skin")), F.years === "all" ? "" : t("lastN", +F.years)].filter(Boolean).map(esc).join(" · ")}</span><small>${t("change")}</small>`;
+}
+function changed() { store.set("filters", F); limit = 100; render(); }
+const sheet = open => { $("#filterBar").classList.toggle("open", open); $("#fSum").setAttribute("aria-expanded", String(open)); };
+$("#fSum").onclick = () => sheet(true); $("#fDone").onclick = $("#sheetBg").onclick = () => sheet(false);
+
+/* ---------- rankings ---------- */
+let hl = null; // swimmer to highlight when coming back from a swimmer page
+function rankRows() {
+  const pool = poolFor().filter(x => x.ag === F.ag);
+  const by = new Map();
+  for (const x of pool) { if (!by.has(x.s)) by.set(x.s, []); by.get(x.s).push(x); }
+  const raceCount = new Set(pool.map(x => x.r.i)).size;
+  let rows = [...by].map(([s, list]) => ({ s: SW[s], list, sc: score(list), last: list.reduce((a, b) => (b.r.date || "") > (a.r.date || "") ? b : a) }))
+    .filter(r => r.sc && !r.s.unnamed);
+  const total = rows.length;
+  rows.sort((a, b) => a.sc.avg - b.sc.avg || b.sc.n - a.sc.n);
+  // shown percentile = position in this filtered list: first is 1/total, last is exactly 100%
+  rows.forEach((r, k) => r.rp = (k + 1) / total * 100);
+  rows.forEach(r => { r.med = [0, 0, 0]; for (const x of r.list) if (x.pa && x.pa <= 3) r.med[x.pa - 1]++; });
+  return { rows, total, raceCount };
+}
+const medTxt = m => `<span class="mc">${m.map((v, k) => v ? `<span title="${t(["gold", "silver", "bronze"][k])}"><i class="m${k + 1}"></i>${v}</span>` : "").join("")}</span>`;
+function renderRank() {
+  const { rows, total, raceCount } = rankRows();
+  const at = hl == null ? -1 : rows.findIndex(r => r.s.i === hl);
+  if (at >= limit) limit = Math.ceil((at + 1) / 100) * 100;
+  const shown = rows.slice(0, limit);
+  $("#main").innerHTML = `<div class="rankgrid"><aside class="agside" aria-label="${esc(t("ageGroup"))}"><div class="aglab">${t("ageGroup")}</div><div class="seg vert" id="agSide" role="group"></div></aside><div class="rankmain">
+  <p class="hint">${t("rankHint", total, raceCount)}</p>
+  <div class="panel"><div class="tablewrap">${rows.length ? `<table class="rank">
+    <thead><tr><th class="num">${t("colRank")}</th><th>${t("colName")}</th><th class="hide-sm">${t("colClub")}</th>
+      <th class="num hide-sm">${t("colRaces")}</th><th class="num">${t("colAvg")}</th><th class="num">${t("colMedals")}</th><th class="num hide-sm">${t("colBest")}</th><th class="hide-sm">${t("colLast")}</th></tr></thead>
+    <tbody>${shown.map((r, k) => `<tr class="go${r.s.i === hl ? " me" : ""}" tabindex="0" data-s="${r.s.i}">
+      <td class="num c-n">${k + 1}</td><td class="c-w"><div class="who">${esc(r.s.name)}</div></td>
+      <td class="clubs hide-sm c-c">${esc(r.s.clubs[0] || "")}<span class="cr"> · ${r.sc.n} ${r.sc.n === 1 ? t("race") : t("races")}</span></td>
+      <td class="num hide-sm">${r.sc.n}</td>
+      <td class="num c-p"><span class="pct"><span class="meter" aria-hidden="true"><i style="width:${Math.max(2, 100 - r.rp)}%"></i></span>${t("top", Math.round(r.rp) || 1)}</span></td>
+      <td class="num c-m">${medTxt(r.med)}</td>
+      <td class="num hide-sm">${t("top", pctTxt(r.sc.best))}</td>
+      <td class="sub hide-sm">${esc(raceName(r.last.r))}</td></tr>`).join("")}</tbody></table>` : `<div class="empty">${t("noRows")}</div>`}</div>
+    ${rows.length > limit ? `<button class="more" type="button" id="more">${t("moreRows", Math.min(100, rows.length - limit))}</button>` : ""}</div></div></div>`;
+  segment($("#agSide"), AGS.map(a => [a, esc(a)]), F.ag, v => { F.ag = v; changed(); });
+  const more = $("#more"); if (more) more.onclick = () => { limit += 100; renderRank(); };
+  bindRows();
+  const me = document.querySelector("tr.me"); if (me) me.scrollIntoView({ block: "center" });
+  hl = null;
+}
+function bindRows() {
+  document.querySelectorAll("tr.go[data-s]").forEach(tr => {
+    const open = () => go(`#/s/${tr.dataset.s}`);
+    tr.onclick = open; tr.onkeydown = e => { if (e.key === "Enter") open(); };
+  });
+}
+
+/* ---------- swimmer ---------- */
+function groupByDist(res) {
+  const m = new Map();
+  for (const x of res) { const k = distKey(x.r); if (!m.has(k)) m.set(k, []); m.get(k).push(x); }
+  return [...m].sort((a, b) => (a[1][0].r.canal - b[1][0].r.canal) || a[0] - b[0]);
+}
+const medal = p => p && p <= 3 ? `<span class="medal m${p}" aria-label="${p}">${p}</span>` : "";
+function renderSwimmer(s) {
+  const groups = groupByDist(s.res);
+  const ags = [...new Set(s.res.map(x => x.ag).filter(Boolean))].reverse();
+  $("#main").innerHTML = `<button class="back" type="button" id="back">← ${t("backRank")}</button>
+  <div class="panel"><div class="prof">
+    <div class="ptop"><div><h1 class="pname">${esc(s.name)}</h1>
+      <div class="meta">${t(s.sex) || ""}${ags.length ? ` · ${t("ageGroups")}: ${ags.map(esc).join(", ")}` : ""}</div>
+      ${(() => { const cs = [...new Set(s.res.map(x => x.c).filter(c => c >= 0))];
+        return cs.length ? `<div class="meta">${t("clubs")}: ${cs.map(c => `<a class="clink" href="#/k/${c}">${esc(CLUBS[c].name)}</a>`).join(" · ")}</div>` : ""; })()}</div>
+</div>
+    <div class="strip">
+      ${(() => { const { rows, total } = rankRows(), k = rows.findIndex(r => r.s.i === s.i), lab = [F.ag, t("km", F.dist), F.mode === "canal" ? "" : (+F.wet ? t("wet") : t("skin"))].filter(Boolean).join(" · ");
+        return k < 0 ? `<div class="stat" style="--c:var(--buoy)"><div class="k">${esc(lab)}</div><div class="v">–</div><div class="s">${t("notInCat")}</div></div>`
+          : `<div class="stat link" id="catCard" role="link" tabindex="0" style="--c:var(--buoy)"><div class="k">${esc(lab)}</div><div class="v">${t("top", Math.round(rows[k].rp) || 1)}</div>
+            <div class="s">${k + 1} / ${total} · <a href="#/" onclick="return false">${t("showInRank")}</a></div></div>`; })()}
+      <div class="stat"><div class="k">${t("totalRaces")}</div><div class="v">${s.res.length}</div><div class="s">${new Set(s.res.map(x => x.r.year)).size} ${t("yearsWord")}</div></div>
+      ${groups.map(([d, list]) => { const sc = score(list); return `<div class="stat" style="--c:${dcol(d)}"><div class="k">${t("km", d)}</div>
+        <div class="v">${sc ? t("top", pctTxt(sc.raw)) : "–"}</div><div class="s">${list.length} ${list.length === 1 ? t("race") : t("races")}${sc ? ` · ${t("best")} ${t("top", pctTxt(sc.best))}` : ""}</div></div>`; }).join("")}
+    </div></div></div>
+  <div class="panel"><div class="phead"><h3>${t("historyH")}</h3>
+    <div class="seg" id="metric" role="group"></div></div>
+    <div class="legend" id="legend"></div><div class="chartbox chart" id="chart"></div></div>
+  <div class="panel"><div class="phead"><h3>${t("raceListH")}</h3><span class="sub">${s.res.length} ${t("races")}</span></div>
+    <div class="tablewrap"><table><thead><tr><th class="hide-sm">${t("colDate")}</th><th>${t("colRace")}</th><th>${t("colDist")}</th>
+      <th class="num">${t("colTime")}</th><th class="num hide-sm">${t("colPace")}</th><th class="num">${t("colAgPct")}</th><th class="num hide-sm">${t("colAllPct")}</th></tr></thead>
+    <tbody>${s.res.map(x => { const out = x.time == null; return `<tr class="go${out ? " out" : ""}" tabindex="0" data-r="${x.r.i}">
+      <td class="num hide-sm" style="text-align:left">${dateTxt(x.r)}</td><td>${esc(x.r.brand)}${x.r.stage ? ` <span class="sub">${esc(x.r.stage)}</span>` : ""}<span class="sm">${dateTxt(x.r)}</span></td>
+      <td><span class="dot" style="--c:${dcol(x.r.dist)}"></span>${t("km", x.r.dist)}${x.r.canal ? "" : ` <span class="sub">${x.r.wet ? t("wet") : t("skin")}</span>`}</td>
+      <td class="num mono">${out ? (x.st || t("dnf")) : fmtT(x.time)}<span class="sm">${fmtP(paceOf(x))}/100m</span></td><td class="num mono hide-sm">${fmtP(paceOf(x))}</td>
+      <td class="num">${x.pa ? `${t("top", pctTxt(x.pctA))} <span class="sub">${x.pa}/${x.na}</span>${medal(x.pa)}` : "–"}</td>
+      <td class="num hide-sm">${x.ps ? `${t("top", pctTxt(x.pctS))} <span class="sub">${x.ps}/${x.ns}</span>${medal(x.ps)}` : "–"}</td></tr>`; }).join("")}</tbody></table></div></div>`;
+  $("#back").onclick = () => { hl = s.i; go("#/"); };
+  const cat = $("#catCard"); if (cat) cat.onclick = () => { hl = s.i; go("#/"); };
+  document.querySelectorAll("tr.go[data-r]").forEach(tr => { const o = () => go(`#/r/${tr.dataset.r}`); tr.onclick = o; tr.onkeydown = e => { if (e.key === "Enter") o(); }; });
+  const drawM = () => { segment($("#metric"), [["pct", t("percentile")], ["pace", t("pace")]], metric, v => { metric = v; store.set("metric", v); drawM(); }); drawChart(s, groups); };
+  drawM();
+}
+
+/* Year on x, one line per distance; each point is that year's field-weighted percentile (or mean pace). */
+function drawChart(s, groups) {
+  const W = Math.max(320, $("#chart").clientWidth - 16), H = W < 640 ? 240 : 300, m = { l: 52, r: 18, t: 18, b: 30 };
+  const series = groups.map(([d, list]) => {
+    const yrs = new Map();
+    for (const x of list) { if (x.time == null) continue; if (!yrs.has(x.r.year)) yrs.set(x.r.year, []); yrs.get(x.r.year).push(x); }
+    const pts = [...yrs].map(([y, l]) => {
+      const v = metric === "pct" ? score(l)?.raw : l.reduce((a, x) => a + paceOf(x), 0) / l.length;
+      return { y, v, l };
+    }).filter(p => p.v != null).sort((a, b) => a.y - b.y);
+    return { d, pts };
+  }).filter(se => se.pts.length);
+  $("#legend").innerHTML = series.map(se => `<span><i style="--c:${dcol(se.d)}"></i>${t("km", se.d)}</span>`).join("");
+  const box = $("#chart");
+  if (!series.length) { box.innerHTML = `<div class="empty">–</div>`; return; }
+  const ys = series.flatMap(se => se.pts.map(p => p.y)), vs = series.flatMap(se => se.pts.map(p => p.v));
+  let y0 = Math.min(...ys), y1 = Math.max(...ys); if (y0 === y1) { y0 -= 1; y1 += 1; }
+  let v0, v1;
+  if (metric === "pct") { v0 = 0; v1 = Math.min(100, Math.ceil(Math.max(...vs) / 10) * 10 || 10); }
+  else { v0 = Math.floor(Math.min(...vs) / 10) * 10; v1 = Math.ceil(Math.max(...vs) / 10) * 10; if (v1 - v0 < 20) v1 = v0 + 20; }
+  const X = y => m.l + (y - y0) / (y1 - y0) * (W - m.l - m.r);
+  const Y = v => m.t + (v - v0) / (v1 - v0) * (H - m.t - m.b); // smaller (better) on top for both metrics
+  const tick = metric === "pct" ? 10 * Math.max(1, Math.round((v1 - v0) / 50)) : (v1 - v0 > 80 ? 20 : 10);
+  let g = "";
+  for (let v = v0; v <= v1 + .01; v += tick) g += `<line class="gl" x1="${m.l}" x2="${W - m.r}" y1="${Y(v)}" y2="${Y(v)}"/><text class="ax" x="${m.l - 8}" y="${Y(v) + 4}" text-anchor="end">${metric === "pct" ? (lang === "tr" ? "%" + v : v + "%") : fmtP(v)}</text>`;
+  const step = Math.max(1, Math.ceil((y1 - y0) / 10));
+  for (let y = Math.ceil(y0); y <= y1; y += step) g += `<text class="ax" x="${X(y)}" y="${H - 8}" text-anchor="middle">${y}</text>`;
+  g += `<text class="ax" x="${m.l}" y="${m.t - 2}" style="font-size:11px">${metric === "pct" ? t("pctAxis") : t("paceAxis")}</text>`;
+  const lines = series.map(se => `<path d="${se.pts.map((p, k) => (k ? "L" : "M") + X(p.y) + " " + Y(p.v)).join("")}" fill="none" stroke="${dcol(se.d)}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`
+    + se.pts.map(p => `<circle cx="${X(p.y)}" cy="${Y(p.v)}" r="4.5" fill="${dcol(se.d)}" stroke="var(--surface)" stroke-width="2"/>`).join("")).join("");
+  const hits = series.flatMap((se, si) => se.pts.map((p, pi) => `<circle data-si="${si}" data-pi="${pi}" cx="${X(p.y)}" cy="${Y(p.v)}" r="14" fill="transparent" tabindex="0" aria-label="${t("km", se.d)} ${p.y}"/>`)).join("");
+  box.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${t("historyH")}">${g}${lines}${hits}</svg>`;
+  const tip = $("#tip");
+  const show = (el, ev) => {
+    const se = series[+el.dataset.si], p = se.pts[+el.dataset.pi];
+    tip.innerHTML = `<b>${t("km", se.d)} · ${p.y}</b>${metric === "pct" ? t("top", pctTxt(p.v)) : fmtP(p.v) + " /100 m"}
+      <div class="sub">${p.l.map(x => `${esc(x.r.brand)} ${esc(x.r.stage)}: ${metric === "pct" ? t("top", pctTxt(x.pctA)) : fmtP(paceOf(x))}`).join("<br>")}</div>`;
+    tip.style.display = "block";
+    const r = el.getBoundingClientRect();
+    tip.style.left = Math.min(window.scrollX + r.left + 16, window.scrollX + document.documentElement.clientWidth - tip.offsetWidth - 8) + "px";
+    tip.style.top = (window.scrollY + r.top - tip.offsetHeight - 6) + "px";
+  };
+  box.querySelectorAll("circle[data-si]").forEach(c => { c.onmouseenter = e => show(c, e); c.onfocus = e => show(c, e); c.onmouseleave = c.onblur = () => tip.style.display = "none"; });
+}
+
+/* ---------- races: pick a year then an event (or an event then a year), then a race ---------- */
+const RV = Object.assign({ by: "year", year: null, brand: null }, store.get("racesV", {}));
+const FIN = new Map(); for (const x of ALL) if (x.time != null) FIN.set(x.r.i, (FIN.get(x.r.i) || 0) + 1);
+const raceRow = r => `<tr class="go" tabindex="0" data-r="${r.i}"><td><span class="dot" style="--c:${dcol(r.dist)}"></span>${t("km", r.dist)}</td>
+  <td>${r.canal ? "" : (r.wet ? t("wet") : t("skin"))}</td><td class="num">${FIN.get(r.i) || 0} <span class="sub">${t("finishers")}</span></td></tr>`;
+function renderRaces() {
+  const mr = RACES.filter(r => r.canal === (F.mode === "canal" ? 1 : 0));
+  const years = [...new Set(mr.map(r => r.year))].sort((a, b) => b - a);
+  const brands = [...new Set(mr.map(r => r.brand))].sort((a, b) => mr.filter(r => r.brand === b).length - mr.filter(r => r.brand === a).length);
+  const byYear = RV.by === "year";
+  const prim = byYear ? years : brands;
+  const p1 = prim.includes(byYear ? RV.year : RV.brand) ? (byYear ? RV.year : RV.brand) : prim[0];
+  const sub = byYear ? brands.filter(b => mr.some(r => r.year === p1 && r.brand === b)) : years.filter(y => mr.some(r => r.brand === p1 && r.year === y));
+  const p2 = sub.includes(byYear ? RV.brand : RV.year) ? (byYear ? RV.brand : RV.year) : sub[0];
+  RV.year = byYear ? p1 : p2; RV.brand = byYear ? p2 : p1; store.set("racesV", RV);
+  const cntY = y => new Set(mr.filter(r => r.year === y).map(r => r.brand + r.stage)).size;
+  const cntB = b => new Set(mr.filter(r => r.brand === b).map(r => r.year)).size;
+  const item = (v, cur, n, unit) => `<button type="button" data-v="${esc(v)}" aria-current="${v === cur}"><span>${esc(v)}</span><small>${n} ${unit}</small></button>`;
+  const list1 = prim.map(v => byYear ? item(v, p1, cntY(v), t("eventsWord")) : item(v, p1, cntB(v), t("yearsWord"))).join("");
+  const list2 = sub.map(v => { const n = mr.filter(r => r.year === (byYear ? p1 : v) && r.brand === (byYear ? v : p1)).length; return item(v, p2, n, t("racesWord")); }).join("");
+  const ev = mr.filter(r => r.year === RV.year && r.brand === RV.brand);
+  const stages = [...new Set(ev.map(r => r.stage))].map(st => ev.filter(r => r.stage === st).sort((a, b) => a.dist - b.dist || a.wet - b.wet))
+    .sort((a, b) => (a[0].date || "").localeCompare(b[0].date || ""));
+  $("#main").innerHTML = `<div class="seg" id="rBy" role="group" style="margin:0 0 12px"></div>
+  <div class="picker">
+    <div class="panel"><div class="plabel">${byYear ? t("year") : t("series")}</div><div class="plist" id="pl1">${list1}</div></div>
+    <div class="panel"><div class="plabel">${byYear ? t("series") : t("year")}</div><div class="plist" id="pl2">${list2}</div></div>
+    <div>${stages.map(g => `<div class="panel"><div class="phead"><div><h3>${esc(g[0].brand)}${g[0].stage ? " " + esc(g[0].stage) : ""} ${g[0].year}</h3>
+      <div class="sub">${dateTxt(g[0])}</div></div></div><div class="tablewrap"><table><tbody>${g.map(raceRow).join("")}</tbody></table></div></div>`).join("")}</div>
+  </div>`;
+  segment($("#rBy"), [["year", t("byYears")], ["event", t("byEvents")]], RV.by, v => { RV.by = v; renderRaces(); });
+  const pick = (el, key) => el.onclick = e => { const b = e.target.closest("button"); if (!b) return; RV[key] = key === "year" ? +b.dataset.v : b.dataset.v; renderRaces(); };
+  pick($("#pl1"), byYear ? "year" : "brand"); pick($("#pl2"), byYear ? "brand" : "year");
+  document.querySelectorAll("tr.go[data-r]").forEach(tr => { const o = () => go(`#/r/${tr.dataset.r}`); tr.onclick = o; tr.onkeydown = e => { if (e.key === "Enter") o(); }; });
+}
+let raceSex = "F", raceCls = "all";
+function renderRace(r) {
+  RV.year = r.year; RV.brand = r.brand; store.set("racesV", RV);
+  const sib = RACES.filter(q => q.brand === r.brand && q.year === r.year && q.stage === r.stage);
+  const dists = [...new Set(sib.map(q => q.dist))].sort((a, b) => a - b);
+  const wets = [...new Set(sib.filter(q => q.dist === r.dist).map(q => q.wet))].sort();
+  const rows = ALL.filter(x => x.r === r);
+  if (!rows.some(x => SW[x.s].sex === raceSex)) raceSex = raceSex === "F" ? "M" : "F";
+  const mine = rows.filter(x => SW[x.s].sex === raceSex).sort((a, b) => (a.ps ?? 1e9) - (b.ps ?? 1e9) || (a.time ?? 1e9) - (b.time ?? 1e9));
+  const hasAg = mine.some(x => x.pa);
+  if (!hasAg) raceCls = "all";
+  const line = x => `<tr class="go${x.time == null ? " out" : ""}" tabindex="0" data-s="${x.s}">`;
+  const tail = x => `<td class="num mono">${x.time == null ? esc(x.st || t("dnf")) : fmtT(x.time)}</td><td class="num mono hide-sm">${fmtP(paceOf(x))}</td></tr>`;
+  let body;
+  if (raceCls === "all") body = `<div class="tablewrap"><table><thead><tr><th class="num">${t("place")}</th><th>${t("colName")}</th><th>${t("ageGroup")}</th><th class="num">${t("agPlace")}</th><th class="num">${t("colTime")}</th><th class="num hide-sm">${t("colPace")}</th></tr></thead>
+    <tbody>${mine.map(x => `${line(x)}<td class="num">${x.ps ?? "–"}${medal(x.ps)}</td><td class="who">${esc(SW[x.s].name)}</td>
+      <td>${esc(x.ag)}</td><td class="num">${x.pa ? x.pa + "/" + x.na : "–"}${medal(x.pa)}</td>${tail(x)}`).join("")}</tbody></table></div>`;
+  else {
+    const ags = [...new Set(mine.map(x => x.ag).filter(Boolean))].sort((a, b) => agStart(a) - agStart(b) || a.localeCompare(b));
+    body = ags.map(ag => { const g = mine.filter(x => x.ag === ag).sort((a, b) => (a.pa ?? 1e9) - (b.pa ?? 1e9));
+      return `<h3 class="agh">${esc(ag)} <span class="sub">${g.filter(x => x.pa).length} ${t("finishers")}</span></h3><div class="tablewrap"><table>
+        <thead><tr><th class="num">${t("agPlace")}</th><th>${t("colName")}</th><th class="num">${t("place")}</th><th class="num">${t("colTime")}</th><th class="num hide-sm">${t("colPace")}</th></tr></thead>
+        <tbody>${g.map(x => `${line(x)}<td class="num">${x.pa ?? "–"}${medal(x.pa)}</td><td class="who">${esc(SW[x.s].name)}</td><td class="num">${x.ps ? x.ps + "/" + x.ns : "–"}</td>${tail(x)}`).join("")}</tbody></table></div>`; }).join("");
+  }
+  $("#main").innerHTML = `<button class="back" type="button" id="back">← ${t("backRaces")}</button>
+  <div class="panel"><div class="phead"><div><h2>${esc(r.brand)} ${esc(r.stage)} ${r.year}</h2><div class="sub">${dateTxt(r)}</div></div></div>
+    <div class="ctrls">
+      ${dists.length > 1 ? `<div class="fld"><span>${t("distance")}</span><div class="seg" id="rd" role="group"></div></div>` : ""}
+      ${!r.canal && wets.length > 1 ? `<div class="fld"><span>${t("suit")}</span><div class="seg" id="rw" role="group"></div></div>` : ""}
+      <div class="fld"><span>${t("sex")}</span><div class="seg" id="rs" role="group"></div></div>
+      ${hasAg ? `<div class="fld"><span>${t("classification")}</span><div class="seg" id="rc" role="group"></div></div>` : ""}
+    </div>${body}</div>`;
+  $("#back").onclick = () => go("#/races");
+  const to = q => q && q !== r && go(`#/r/${q.i}`);
+  if ($("#rd")) segment($("#rd"), dists.map(d => [d, t("km", d)]), r.dist, v => to(sib.find(q => q.dist === +v && q.wet === r.wet) || sib.find(q => q.dist === +v)));
+  if ($("#rw")) segment($("#rw"), wets.map(w => [w, w ? t("wet") : t("skin")]), r.wet, v => to(sib.find(q => q.dist === r.dist && q.wet === +v)));
+  segment($("#rs"), [["F", t("F")], ["M", t("M")]], raceSex, v => { raceSex = v; renderRace(r); });
+  if ($("#rc")) segment($("#rc"), [["all", t("classAll")], ["ag", t("classAg")]], raceCls, v => { raceCls = v; renderRace(r); });
+  bindRows();
+}
+
+/* ---------- clubs: Olympic-style medal table ---------- */
+const KF = Object.assign({ type: "sex", sex: "all", brand: "all", year: "all", dist: "all", view: "table" }, store.get("clubF", {}));
+const BRANDS = [...new Set(RACES.map(r => r.brand))].sort((a, b) => RACES.filter(r => r.brand === b).length - RACES.filter(r => r.brand === a).length);
+const YEARS = [...new Set(RACES.map(r => r.year))].sort((a, b) => b - a);
+const placeOf = x => KF.type === "ag" ? x.pa : x.ps;
+function medalsWhere(keep) {
+  const out = [];
+  for (const x of ALL) { const p = placeOf(x); if (x.c >= 0 && p && p <= 3 && keep(x)) out.push({ x, p }); }
+  return out;
+}
+const brandsFor = () => BRANDS.filter(b => RACES.some(r => r.brand === b && r.canal === (F.mode === "canal" ? 1 : 0)));
+const kfKeep = x => x.r.canal === (F.mode === "canal" ? 1 : 0) && (KF.sex === "all" || SW[x.s].sex === KF.sex) && (KF.brand === "all" || x.r.brand === KF.brand)
+  && (KF.year === "all" || (KF.year[0] === "l" ? x.r.year > MAXY - +KF.year.slice(1) : x.r.year === +KF.year)) && (KF.dist === "all" || x.r.dist === +KF.dist);
+function tally(ms, keyf) {
+  const m = new Map();
+  for (const { x, p } of ms) { const k = keyf(x); if (!m.has(k)) m.set(k, { k, m: [0, 0, 0], sw: new Set() }); const e = m.get(k); e.m[p - 1]++; e.sw.add(x.s); }
+  return [...m.values()].map(e => ({ ...e, tot: e.m[0] + e.m[1] + e.m[2] }));
+}
+const olympic = (a, b) => b.m[0] - a.m[0] || b.m[1] - a.m[1] || b.m[2] - a.m[2];
+const medalCells = e => e.m.map(v => `<td class="num cnt${v ? "" : " zero"}">${v}</td>`).join("") + `<td class="num cnt">${e.tot}</td>`;
+const medalHead = () => [1, 2, 3].map(k => `<th class="num"><span class="mh"><span class="medal m${k}" aria-hidden="true">${k}</span><span class="lbl">${t(["gold", "silver", "bronze"][k - 1])}</span></span></th>`).join("") + `<th class="num">${t("total")}</th>`;
+function selectHTML(id, opts, cur) { return `<select id="${id}">${opts.map(([v, l]) => `<option value="${esc(v)}" ${String(v) === String(cur) ? "selected" : ""}>${esc(l)}</option>`).join("")}</select>`; }
+let kOpen = false;
+function clubSummary() {
+  const yr = KF.year === "all" ? "" : KF.year[0] === "l" ? t("lastN", +KF.year.slice(1)) : KF.year;
+  return [KF.type === "ag" ? t("mAg") : t("mSex"), KF.sex === "all" ? "" : t(KF.sex), KF.brand === "all" ? "" : KF.brand, yr,
+    KF.dist === "all" ? "" : t("km", +KF.dist), { table: t("vTable"), year: t("vYear"), event: t("vEvent") }[KF.view]].filter(Boolean).map(esc).join(" · ");
+}
+function clubFilters(withView) {
+  if (withView) return `<div class="sheetwrap${kOpen ? " open" : ""}" id="kWrap">
+    <button type="button" class="fsum" id="kSum" aria-expanded="${kOpen}"><span>${clubSummary()}</span><small>${t("change")}</small></button>
+    <div class="sheetbg" id="kBg"></div>
+    <div class="clubf fsheet"><div class="sheethead"><b>${t("filters")}</b><button type="button" class="btn primary" id="kDone">${t("done")}</button></div>
+    ${clubFields(true)}</div></div>`;
+  return `<div class="clubf">${clubFields(false)}</div>`;
+}
+function clubFields(withView) {
+  return `
+    <div class="fld"><span>${t("medalType")}</span><div class="seg" id="kType" role="group"></div></div>
+    <div class="fld"><span>${t("sex")}</span><div class="seg" id="kSex" role="group"></div></div>
+    ${withView ? `<div class="fld"><span>${t("series")}</span>${selectHTML("kBrand", [["all", t("all")], ...brandsFor().map(b => [b, b])], KF.brand)}</div>
+    <div class="fld"><span>${t("year")}</span>${selectHTML("kYear", [["all", t("all")], ["l1", t("lastN", 1)], ["l2", t("lastN", 2)], ["l3", t("lastN", 3)], ...YEARS.map(y => [y, y])], KF.year)}</div>
+    <div class="fld"><span>${t("distance")}</span>${selectHTML("kDist", [["all", t("all")], ...DISTS[F.mode].map(d => [d, t("km", d)])], KF.dist)}</div>
+    <div class="fld"><span>${t("viewAs")}</span><div class="seg" id="kView" role="group"></div></div>` : ""}`;
+}
+function bindClubFilters(redraw) {
+  const set = (k, v) => { KF[k] = v; store.set("clubF", KF); limit = 100; redraw(); };
+  segment($("#kType"), [["sex", t("mSex")], ["ag", t("mAg")]], KF.type, v => set("type", v));
+  segment($("#kSex"), [["all", t("both")], ["F", t("F")], ["M", t("M")]], KF.sex, v => set("sex", v));
+  if ($("#kView")) {
+    segment($("#kView"), [["table", t("vTable")], ["year", t("vYear")], ["event", t("vEvent")]], KF.view, v => set("view", v));
+    for (const [id, k] of [["kBrand", "brand"], ["kYear", "year"], ["kDist", "dist"]]) $("#" + id).onchange = e => set(k, e.target.value);
+    $("#kSum").onclick = () => { kOpen = true; $("#kWrap").classList.add("open"); };
+    $("#kDone").onclick = $("#kBg").onclick = () => { kOpen = false; $("#kWrap").classList.remove("open"); };
+  }
+}
+function renderClubs() {
+  const ms = medalsWhere(kfKeep);
+  const rows = tally(ms, x => x.c).sort((a, b) => olympic(a, b) || a.k - b.k);
+  let rank = 0; rows.forEach((e, k) => { e.rank = k && !olympic(rows[k - 1], e) ? rows[k - 1].rank : (rank = k + 1); });
+  const shown = rows.slice(0, limit);
+  let body;
+  if (!rows.length) body = `<div class="empty">${t(F.mode === "canal" ? "noClubData" : "noMedals")}</div>`;
+  else if (KF.view === "table") body = `<table><thead><tr><th class="num">${t("colRank")}</th><th>${t("colClub")}</th>${medalHead()}<th class="num hide-sm">${t("medalists")}</th></tr></thead>
+    <tbody>${shown.map(e => `<tr class="go" tabindex="0" data-k="${e.k}"><td class="num">${e.rank}</td><td class="who">${esc(CLUBS[e.k].name)}</td>${medalCells(e)}<td class="num hide-sm">${e.sw.size}</td></tr>`).join("")}</tbody></table>`;
+  else {
+    const cols = KF.view === "year" ? [...new Set(ms.map(o => o.x.r.year))].sort((a, b) => a - b) : brandsFor().filter(b => ms.some(o => o.x.r.brand === b));
+    const colOf = x => KF.view === "year" ? x.r.year : x.r.brand;
+    const cell = new Map();
+    for (const { x, p } of ms) { const key = x.c + "|" + colOf(x); if (!cell.has(key)) cell.set(key, [0, 0, 0]); cell.get(key)[p - 1]++; }
+    const mx = Math.max(...[...cell.values()].map(m => m[0] + m[1] + m[2]));
+    body = `<table class="heat"><thead><tr><th class="num">${t("colRank")}</th><th>${t("colClub")}</th>${cols.map(c => `<th class="num">${esc(c)}</th>`).join("")}<th class="num">${t("total")}</th></tr></thead>
+      <tbody>${shown.map(e => `<tr class="go" tabindex="0" data-k="${e.k}"><td class="num">${e.rank}</td><td class="who">${esc(CLUBS[e.k].name)}</td>${cols.map(c => {
+        const m = cell.get(e.k + "|" + c); if (!m) return `<td class="num zero">·</td>`;
+        const n = m[0] + m[1] + m[2];
+        return `<td class="num h" style="--a:${Math.round(8 + 50 * n / mx)}%" title="${t("gold")} ${m[0]} · ${t("silver")} ${m[1]} · ${t("bronze")} ${m[2]}">${n}</td>`; }).join("")}<td class="num cnt">${e.tot}</td></tr>`).join("")}</tbody></table>`;
+  }
+  $("#main").innerHTML = `${clubFilters(true)}<p class="hint">${t("clubHint", rows.length, ms.length)}${KF.view !== "table" ? " " + t("heatHint") : ""}</p>
+    <div class="panel"><div class="phead"><h2>${t("clubTable")}</h2></div><div class="tablewrap">${body}</div>
+    ${rows.length > limit ? `<button class="more" type="button" id="more">${t("moreClubs", Math.min(100, rows.length - limit))}</button>` : ""}</div>
+    <p class="sub" style="margin:10px 0 0;max-width:86ch">${t("clubFoot")}</p>`;
+  bindClubFilters(renderClubs);
+  const more = $("#more"); if (more) more.onclick = () => { limit += 100; renderClubs(); };
+  document.querySelectorAll("tr.go[data-k]").forEach(tr => { const o = () => go(`#/k/${tr.dataset.k}`); tr.onclick = o; tr.onkeydown = e => { if (e.key === "Enter") o(); }; });
+}
+let recentN = 30;
+function renderClub(cl) {
+  const mine = ALL.filter(x => x.c === cl.i);
+  const ms = medalsWhere(x => x.c === cl.i && x.r.canal === (F.mode === "canal" ? 1 : 0) && (KF.sex === "all" || SW[x.s].sex === KF.sex));
+  const all = tally(ms, () => 0)[0] || { m: [0, 0, 0], tot: 0, sw: new Set() };
+  const byYear = tally(ms, x => x.r.year).sort((a, b) => b.k - a.k);
+  const byEvent = tally(ms, x => x.r.brand).sort((a, b) => olympic(a, b));
+  const bySw = tally(ms, x => x.s).sort((a, b) => olympic(a, b) || b.tot - a.tot);
+  const recent = ms.slice().sort((a, b) => (b.x.r.date || "").localeCompare(a.x.r.date || "") || b.x.r.year - a.x.r.year || a.p - b.p);
+  // events matrix: rows = events, columns = years; cell = medals (bold) and race starts (grey)
+  const starts = mine.filter(x => x.r.canal === (F.mode === "canal" ? 1 : 0) && (KF.sex === "all" || SW[x.s].sex === KF.sex));
+  const yrs = [...new Set(starts.map(x => x.r.year))].sort((a, b) => a - b), evs = brandsFor().filter(b => starts.some(x => x.r.brand === b));
+  const cellM = new Map(), cellS = new Map(), key = (b, y) => b + "|" + y;
+  for (const x of starts) for (const k of [key(x.r.brand, x.r.year), key(x.r.brand, "T"), key("T", x.r.year), key("T", "T")]) cellS.set(k, (cellS.get(k) || 0) + 1);
+  for (const { x, p } of ms) for (const k of [key(x.r.brand, x.r.year), key(x.r.brand, "T"), key("T", x.r.year), key("T", "T")]) { if (!cellM.has(k)) cellM.set(k, [0, 0, 0]); cellM.get(k)[p - 1]++; }
+  const mx = Math.max(1, ...[...cellM].filter(([k]) => !k.includes("T")).map(([, m]) => m[0] + m[1] + m[2]));
+  const mcell = (b, y) => { const st = cellS.get(key(b, y)); if (!st) return `<td class="num zero">·</td>`; const m = cellM.get(key(b, y)) || [0, 0, 0], n = m[0] + m[1] + m[2];
+    return `<td class="num${n && b !== "T" && y !== "T" ? " h" : ""}" style="--a:${Math.round(10 + 45 * n / mx)}%" title="${t("gold")} ${m[0]} · ${t("silver")} ${m[1]} · ${t("bronze")} ${m[2]} · ${st} ${t("starts")}">${n ? `<b>${n}</b>` : ""}<span class="sub">${st}</span></td>`; };
+  const matrix = starts.length ? `<div class="panel" style="margin-top:16px"><div class="phead"><h3>${t("matrixH")}</h3><span class="sub">${t("matrixNote")}</span></div><div class="tablewrap"><table class="matrix">
+    <thead><tr><th>${t("series")}</th>${yrs.map(y => `<th class="num">${y}</th>`).join("")}<th class="num">${t("total")}</th></tr></thead>
+    <tbody>${evs.map(b => `<tr><td class="who">${esc(b)}</td>${yrs.map(y => mcell(b, y)).join("")}${mcell(b, "T")}</tr>`).join("")}
+      <tr class="tot"><td>${t("total")}</td>${yrs.map(y => mcell("T", y)).join("")}${mcell("T", "T")}</tr></tbody></table></div></div>` : "";
+  const small = (head, list, lab) => `<table><thead><tr><th>${head}</th>${medalHead()}</tr></thead><tbody>${list.map(e => `<tr><td>${lab(e)}</td>${medalCells(e)}</tr>`).join("")}</tbody></table>`;
+  $("#main").innerHTML = `<button class="back" type="button" id="back">← ${t("backClubs")}</button>
+  <div class="panel"><div class="prof">
+    <h1 class="pname">${esc(cl.name)}</h1>
+    <div class="meta">${t("clubMeta", new Set(mine.map(x => x.s)).size, mine.length)}</div>
+    <div style="margin-top:12px">${clubFilters(false)}</div>
+    <div class="strip">${[0, 1, 2].map(k => `<div class="stat" style="--c:var(--${["gold", "silver", "bronze"][k]})"><div class="k">${t(["gold", "silver", "bronze"][k])}</div><div class="v">${all.m[k]}</div></div>`).join("")}
+      <div class="stat"><div class="k">${t("total")}</div><div class="v">${all.tot}</div><div class="s">${all.sw.size} ${t("medalists").toLocaleLowerCase(lang)}</div></div></div>
+  </div></div>
+  ${matrix}
+  ${ms.length ? `
+  <div class="panel"><div class="phead"><h3>${t("medalists")}</h3><span class="sub">${bySw.length}</span></div><div class="tablewrap"><table>
+    <thead><tr><th>${t("colSwim")}</th>${medalHead()}</tr></thead>
+    <tbody>${bySw.map(e => `<tr class="go" tabindex="0" data-s="${e.k}"><td class="who">${esc(SW[e.k].name)}</td>${medalCells(e)}</tr>`).join("")}</tbody></table></div></div>
+  <div class="panel"><div class="phead"><h3>${t("recent")}</h3><span class="sub">${recent.length}</span></div><div class="tablewrap"><table>
+    <thead><tr><th class="hide-sm">${t("colDate")}</th><th>${t("colRace")}</th><th>${t("colDist")}</th><th>${t("colSwim")}</th><th class="num">${t("place")}</th></tr></thead>
+    <tbody>${recent.slice(0, recentN).map(({ x, p }) => `<tr class="go" tabindex="0" data-r="${x.r.i}"><td class="hide-sm">${dateTxt(x.r)}</td><td>${esc(x.r.brand)}${x.r.stage ? ` <span class="sub">${esc(x.r.stage)}</span>` : ""}<span class="sm">${dateTxt(x.r)}</span></td>
+      <td><span class="dot" style="--c:${dcol(x.r.dist)}"></span>${t("km", x.r.dist)}${x.r.canal ? "" : ` <span class="sub">${x.r.wet ? t("wet") : t("skin")}</span>`}</td>
+      <td class="who">${esc(SW[x.s].name)}${KF.type === "ag" && x.ag ? ` <span class="sub">${esc(x.ag)}</span>` : ""}</td><td class="num">${medal(p)}</td></tr>`).join("")}</tbody></table></div>
+    ${recent.length > recentN ? `<button class="more" type="button" id="moreRec">${t("moreMed", Math.min(50, recent.length - recentN))}</button>` : ""}</div>`
+  : `<div class="panel" style="margin-top:16px"><div class="empty">${t("noMedals")}</div></div>`}`;
+  $("#back").onclick = () => go("#/clubs");
+  const mr = $("#moreRec"); if (mr) mr.onclick = () => { recentN += 50; renderClub(cl); };
+  bindClubFilters(() => renderClub(cl));
+  bindRows();
+  document.querySelectorAll("tr.go[data-r]").forEach(tr => { const o = () => go(`#/r/${tr.dataset.r}`); tr.onclick = o; tr.onkeydown = e => { if (e.key === "Enter") o(); }; });
+}
+
+/* ---------- routing ---------- */
+function go(h) { if (location.hash === h) route(); else location.hash = h; }
+function route() {
+  const p = location.hash.replace(/^#\/?/, "").split("/");
+  $("#tip").style.display = "none";
+  if (p[0] === "s" && SW[+p[1]]) view = { name: "swimmer", s: SW[+p[1]] };
+  else if (p[0] === "races") view = { name: "races" };
+  else if (p[0] === "clubs") view = { name: "clubs" };
+  else if (p[0] === "k" && CLUBS[+p[1]]) { view = { name: "club", c: CLUBS[+p[1]] }; recentN = 30; }
+  else if (p[0] === "r" && RACES[+p[1]]) view = { name: "race", r: RACES[+p[1]] };
+  else view = { name: "rank" };
+  render(true);
+}
+function render(scroll) {
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-t]").forEach(el => el.textContent = t(el.dataset.t));
+  document.querySelectorAll(".lang button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
+  const nav = { rank: "rank", swimmer: "rank", races: "races", race: "races", clubs: "clubs", club: "clubs" }[view.name];
+  document.querySelectorAll("[data-nav]").forEach(b => b.dataset.nav === nav ? b.setAttribute("aria-current", "page") : b.removeAttribute("aria-current"));
+  $("#filterBar").hidden = !(view.name === "rank" || view.name === "swimmer");
+  if (scroll) sheet(false);
+  drawFilters();
+  if (view.name === "rank") renderRank();
+  else if (view.name === "swimmer") renderSwimmer(view.s);
+  else if (view.name === "races") renderRaces();
+  else if (view.name === "clubs") renderClubs();
+  else if (view.name === "club") renderClub(view.c);
+  else renderRace(view.r);
+  $("#coverage").textContent = t("coverage", RACES.length.toLocaleString(), SW.length.toLocaleString());
+  if (scroll) window.scrollTo({ top: view.name === "swimmer" ? Math.max(0, $("#main").offsetTop - 70) : 0 });
+}
+$("#home").onclick = () => go("#/");
+document.querySelectorAll("[data-nav]").forEach(b => b.onclick = () => go({ rank: "#/", races: "#/races", clubs: "#/clubs" }[b.dataset.nav]));
+document.querySelectorAll("[data-lang]").forEach(b => b.onclick = () => { lang = b.dataset.lang; store.set("lang", lang); mountSearch(); render(); });
+function mountSearch() { searchBox($("#topSearch"), s => go(`#/s/${s.i}`)); }
+mountSearch();
+window.addEventListener("hashchange", route);
+route();
+})();
+</script>
+
+</body>
+</html>
