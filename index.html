@@ -17,7 +17,7 @@
   --line: #d9e1e7; --sea: #0e5a7a; --sea-ink: #ffffff; --buoy: #e8641e; --sel: #e3eef4; --grid: #e6ecf0;
   --gold: #b88a00; --silver: #7f8c95; --bronze: #a0592f;
   --d1000: #2a78d6; --d2000: #eb6834; --d3000: #1baf7a; --d5000: #eda100;
-  --d6000: #e87ba4; --d10000: #008300; --d6500: #6250d6; --d4500: #e34948;
+  --d6000: #e87ba4; --d10000: #008300; --d6500: #6250d6; --d4500: #e34948; --d7000: #00968f;
   --pA: #2a78d6; --pB: #eb6834;
   --display: "Barlow Condensed", "Arial Narrow", sans-serif;
   --body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
@@ -28,14 +28,14 @@
   --line: #22394a; --sea: #5fb3d9; --sea-ink: #0b1820; --buoy: #f07a3a; --sel: #173445; --grid: #1a2e3b;
   --gold: #e0b42a; --silver: #b3bfc7; --bronze: #c9825a;
   --d1000: #3987e5; --d2000: #d95926; --d3000: #199e70; --d5000: #c98500;
-  --d6000: #d55181; --d10000: #2f9a2f; --d6500: #9085e9; --d4500: #e66767;
+  --d6000: #d55181; --d10000: #2f9a2f; --d6500: #9085e9; --d4500: #e66767; --d7000: #2fa9a1;
   --pA: #3987e5; --pB: #d95926; color-scheme: dark } }
 :root[data-theme="dark"] {
   --bg: #0b1820; --surface: #11222d; --ink: #e6eef3; --ink-2: #a9bac5; --ink-3: #8a9daa;
   --line: #22394a; --sea: #5fb3d9; --sea-ink: #0b1820; --buoy: #f07a3a; --sel: #173445; --grid: #1a2e3b;
   --gold: #e0b42a; --silver: #b3bfc7; --bronze: #c9825a;
   --d1000: #3987e5; --d2000: #d95926; --d3000: #199e70; --d5000: #c98500;
-  --d6000: #d55181; --d10000: #2f9a2f; --d6500: #9085e9; --d4500: #e66767;
+  --d6000: #d55181; --d10000: #2f9a2f; --d6500: #9085e9; --d4500: #e66767; --d7000: #2fa9a1;
   --pA: #3987e5; --pB: #d95926; color-scheme: dark }
 * { box-sizing: border-box }
 [hidden] { display: none !important }
@@ -338,7 +338,7 @@ const T = {
     foot1: "Sıralamadaki yüzdelik, yüzücünün seçili filtredeki (cinsiyet, yaş grubu, mesafe, kıyafet, yıllar) sırasıdır: sıra ÷ yüzücü sayısı; birinci en küçük değeri, sonuncu %100’ü alır. Sıra, aşağıdaki yarış puanına göre belirlenir. Yarış yüzdeliği: bir yüzücünün sahadaki yeri, (sıra − 0,5) ÷ bitiren sayısı. 10 kişide 1. olmak ilk %5 demektir. Yarışlar arası puan, saha büyüklüğüne göre ağırlıklı ortalamadır (√bitiren): kalabalık bir yaş grubundaki sonuç, iki kişilik bir gruptakinden daha çok sayılır. Ortalamaya ayrıca bir “orta sıra” sonucu (4 kişide %50) eklenir; böylece tek bir şanslı yarış, uzun ve istikrarlı bir geçmişin önüne geçemez.",
     foot2: "Neopren ve mayolu kategoriler aynı yarışta ayrı yarış sayılır. Sıralar süreden yeniden hesaplanır. Yaş grupları organizatörün yayımladığı gibidir. 1, 2, 3, 5, 6 ve 10 km dışındaki yarışlar, Boğaziçi ve Çanakkale geçişleri hariç, dahil edilmedi. Boğaziçi 2026 soyadları gizli yayımlandığı için o yarış diğer yarışlarla eşleştirilmedi.",
     coverage: (r, s) => `${r} yarış, ${s} yüzücü. Kaynak: organizatörlerin yayımladığı sonuç dosyaları.`,
-    km: d => d === 6500 ? "Boğaziçi" : d === 4500 ? "Çanakkale" : `${d / 1000} km`,
+    km: d => d === 6500 ? "Boğaziçi" : d === 4500 ? "Çanakkale" : d === 7000 ? "Meis–Kaş" : `${d / 1000} km`,
     navClubs: "Kulüpler", byYears: "Yıllara göre", byEvents: "Etkinliklere göre", eventsWord: "etkinlik", racesWord: "yarış", classAll: "Genel klasman", classAg: "Yaş grupları", backRaces: "Yarışlara dön", matrixH: "Etkinlikler (yıl × etkinlik)", matrixNote: "Kalın: madalya · gri: yarış katılımı", starts: "katılım", moreClubs: n => `${n} kulüp daha göster`, moreMed: n => `${n} madalya daha göster`, clubTable: "Kulüp madalya tablosu", medalType: "Madalya", mSex: "Genel (K/E ilk 3)", mAg: "Yaş grubu ilk 3",
     series: "Etkinlik", all: "Tümü", both: "Tümü", gold: "Altın", silver: "Gümüş", bronze: "Bronz", total: "Toplam",
     medalists: "Madalyalı yüzücü", viewAs: "Görünüm", vTable: "Madalya tablosu", vYear: "Yıllara göre", vEvent: "Etkinliklere göre",
@@ -370,7 +370,7 @@ const T = {
     foot1: "The percentile in the rankings is the swimmer's position in the selected filter (sex, age group, distance, suit, years): rank ÷ number of swimmers, so first gets the smallest value and last gets 100%. The order comes from the race rating below. Race percentile: where a swimmer finished in the field, (place − 0.5) ÷ finishers. 1st of 10 is top 5%. The rating across races is a field-size-weighted average (√finishers), so a result in a big age group counts more than one in a group of two. One mid-field result (top 50% in a field of 4) is mixed in, so a single lucky swim can't outrank a long, consistent record.",
     foot2: "Wetsuit and no-wetsuit categories in one race are separate races. Places are recomputed from times. Age groups are as each organiser published them. Races at distances other than 1, 2, 3, 5, 6 and 10 km are left out, except the Boğaziçi and Çanakkale crossings. Boğaziçi 2026 printed surnames masked, so that race isn't linked to other races.",
     coverage: (r, s) => `${r} races, ${s} swimmers. Source: organisers' published result files.`,
-    km: d => d === 6500 ? "Boğaziçi" : d === 4500 ? "Çanakkale" : `${d / 1000} km`,
+    km: d => d === 6500 ? "Boğaziçi" : d === 4500 ? "Çanakkale" : d === 7000 ? "Meis–Kaş" : `${d / 1000} km`,
     navClubs: "Clubs", byYears: "By year", byEvents: "By event", eventsWord: "events", racesWord: "races", classAll: "Overall", classAg: "Age groups", backRaces: "Back to races", matrixH: "Events (year × event)", matrixNote: "Bold: medals · grey: race starts", starts: "starts", moreClubs: n => `Show ${n} more`, moreMed: n => `Show ${n} more`, clubTable: "Club medal table", medalType: "Medals", mSex: "Overall (W/M top 3)", mAg: "Age-group top 3",
     series: "Event", all: "All", both: "All", gold: "Gold", silver: "Silver", bronze: "Bronze", total: "Total",
     medalists: "Medallists", viewAs: "View", vTable: "Medal table", vYear: "By year", vEvent: "By event",
@@ -402,7 +402,7 @@ const T = {
     foot1: "Процентиль в рейтинге — это позиция пловца внутри выбранного фильтра (пол, возрастная группа, дистанция, костюм, годы): место ÷ число пловцов, поэтому у первого наименьшее значение, у последнего ровно 100%. Порядок задаёт рейтинг по заплывам. Процентиль заплыва: (место − 0,5) ÷ число финишировавших; 1-е место из 10 — топ 5%. Рейтинг по нескольким заплывам — среднее, взвешенное по размеру группы (√финишировавших), поэтому результат в большой группе весит больше, чем в группе из двух. Добавляется один средний результат (топ 50% в группе из 4), чтобы один удачный заплыв не обгонял долгую стабильную историю.",
     foot2: "Категории с гидрокостюмом и без него в одном заплыве считаются разными заплывами. Места пересчитаны по времени. Возрастные группы — как их опубликовал организатор. Дистанции кроме 1, 2, 3, 5, 6 и 10 км не учитываются, за исключением переплывов Босфора и Дарданелл. В 2026 году Boğaziçi скрыл фамилии, поэтому тот заплыв не связан с другими.",
     coverage: (r, s) => `${r} заплывов, ${s} пловцов. Источник: протоколы организаторов.`,
-    km: d => d === 6500 ? "Босфор" : d === 4500 ? "Дарданеллы" : `${d / 1000} км`,
+    km: d => d === 6500 ? "Босфор" : d === 4500 ? "Дарданеллы" : d === 7000 ? "Мейс–Каш" : `${d / 1000} км`,
     navClubs: "Клубы", byYears: "По годам", byEvents: "По соревнованиям", eventsWord: "соревнований", racesWord: "заплывов", classAll: "Абсолют", classAg: "Возрастные группы", backRaces: "Назад к заплывам", matrixH: "Соревнования (год × соревнование)", matrixNote: "Жирным: медали · серым: старты", starts: "стартов", moreClubs: n => `Показать ещё ${n}`, moreMed: n => `Показать ещё ${n}`, clubTable: "Медальный зачёт клубов", medalType: "Медали", mSex: "Абсолют (Ж/М топ-3)", mAg: "Топ-3 возрастной группы",
     series: "Соревнование", all: "Все", both: "Все", gold: "Золото", silver: "Серебро", bronze: "Бронза", total: "Всего",
     medalists: "Призёры", viewAs: "Вид", vTable: "Медальный зачёт", vYear: "По годам", vEvent: "По соревнованиям",
@@ -433,7 +433,7 @@ const ALL = D.results.map(([s, r, ag, time, st, ps, ns, pa, na, c = -1]) => {
 });
 SW.forEach(s => s.res.sort((a, b) => (b.r.date || "").localeCompare(a.r.date || "") || b.r.year - a.r.year));
 const MAXY = Math.max(...RACES.map(r => r.year));
-const DISTS = { open: [1000, 2000, 3000, 5000, 6000, 10000], canal: [6500, 4500] };
+const DISTS = { open: [1000, 2000, 3000, 5000, 6000, 10000], canal: [6500, 4500, 7000] };
 const dcol = d => `var(--d${d})`;
 const fold = s => String(s).toLocaleLowerCase("tr").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/ı/g, "i");
 SW.forEach(s => { s.key = [s.name, ...s.variants].map(fold).join(" | "); s.n = s.res.length; });
@@ -459,7 +459,7 @@ function score(list, key = "pctA", nkey = "na") {
   }
   return w ? { avg: (s + PRIOR_W * PRIOR) / (w + PRIOR_W), raw: s / w, best, n } : null;
 }
-const distKey = r => r.dist; // canal distances are unique (6500 Boğaziçi, 4500 Çanakkale)
+const distKey = r => r.dist; // canal distances are unique (6500 Boğaziçi, 4500 Çanakkale, 7000 Meis–Kaş)
 
 /* ---------- state ---------- */
 const F = Object.assign({ mode: "open", sex: "M", ag: "35-39", dist: 5000, wet: 0, years: "all", cut: 15 }, store.get("filters", {}));
