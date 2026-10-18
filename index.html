@@ -440,7 +440,7 @@ const DISTS = { open: [1000, 2000, 3000, 5000, 6000, 10000], canal: [6500, 4500,
 DISTS.all = [...DISTS.open, ...DISTS.canal];
 const isCanalD = d => DISTS.canal.includes(+d);
 // mode "all" (default) mixes open water and strait crossings; the other two narrow to one kind
-const inMode = r => F.mode === "all" || r.canal === (F.mode === "canal" ? 1 : 0);
+const inMode = (r, f = F) => f.mode === "all" || r.canal === (f.mode === "canal" ? 1 : 0);
 const dcol = d => `var(--d${d})`;
 const fold = s => String(s).toLocaleLowerCase("tr").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/ı/g, "i");
 SW.forEach(s => { s.key = [s.name, ...s.variants].map(fold).join(" | "); s.n = s.res.length; });
@@ -511,10 +511,10 @@ function segment(el, opts, cur, onSet) {
   el.innerHTML = opts.map(([v, label, dis]) => `<button type="button" aria-pressed="${String(v) === String(cur)}" data-v="${v}" ${dis ? "disabled" : ""}>${label}</button>`).join("");
   el.onclick = e => { const b = e.target.closest("button"); if (b && !b.disabled) onSet(b.dataset.v); };
 }
-function poolFor(opts = {}) {
-  const yMin = F.years === "all" ? 0 : MAXY - +F.years + 1;
-  return ALL.filter(x => inMode(x.r) && SW[x.s].sex === F.sex && x.r.year >= yMin
-    && (opts.anyDist || x.r.dist === +F.dist) && (x.r.canal || opts.anyWet || x.r.wet === +F.wet));
+function poolFor(opts = {}, f = F) {
+  const yMin = f.years === "all" ? 0 : MAXY - +f.years + 1;
+  return ALL.filter(x => inMode(x.r, f) && SW[x.s].sex === f.sex && x.r.year >= yMin
+    && (opts.anyDist || x.r.dist === +f.dist) && (x.r.canal || opts.anyWet || x.r.wet === +f.wet));
 }
 const agStart = a => { const m = /(\d+)/.exec(a); return m ? +m[1] : 999; };
 function drawFilters() {
@@ -546,8 +546,8 @@ $("#fSum").onclick = () => sheet(true); $("#fDone").onclick = $("#sheetBg").oncl
 
 /* ---------- rankings ---------- */
 let hl = null; // swimmer to highlight when coming back from a swimmer page
-function rankRows() {
-  const pool = poolFor().filter(x => x.ag === F.ag);
+function rankRows(f = F) {
+  const pool = poolFor({}, f).filter(x => x.ag === f.ag);
   const by = new Map();
   for (const x of pool) { if (!by.has(x.s)) by.set(x.s, []); by.get(x.s).push(x); }
   const raceCount = new Set(pool.map(x => x.r.i)).size;
@@ -602,6 +602,9 @@ const SL = { s: -1, brand: "all", dist: "all" }; // race-list filters on a swimm
 function renderSwimmer(s) {
   const groups = groupByDist(s.res);
   const ags = [...new Set(s.res.map(x => x.ag).filter(Boolean))].reverse();
+  // category card uses the swimmer's own latest age-group result, not the rankings filter (g, 2026-10-18)
+  const own = s.res.find(x => x.ag && x.pa && x.time != null);
+  const cat = own && { mode: "all", sex: s.sex, ag: own.ag, dist: own.r.dist, wet: own.r.canal ? 0 : own.r.wet, years: "all" };
   $("#main").innerHTML = `<button class="back" type="button" id="back">← ${t("backRank")}</button>
   <div class="panel"><div class="prof">
     <div class="ptop"><div><h1 class="pname">${esc(s.name)}</h1>
@@ -610,7 +613,8 @@ function renderSwimmer(s) {
         return cs.length ? `<div class="meta">${t("clubs")}: ${cs.map(c => `<a class="clink" href="#/k/${c}">${esc(CLUBS[c].name)}</a>`).join(" · ")}</div>` : ""; })()}</div>
 </div>
     <div class="strip">
-      ${(() => { const { rows, total } = rankRows(), k = rows.findIndex(r => r.s.i === s.i), lab = [F.ag, t("km", F.dist), isCanalD(F.dist) ? "" : (+F.wet ? t("wet") : t("skin"))].filter(Boolean).join(" · ");
+      ${(() => { if (!cat) return `<div class="stat" style="--c:var(--buoy)"><div class="k">${t("inCat")}</div><div class="v">–</div><div class="s">${t("notInCat")}</div></div>`;
+        const { rows, total } = rankRows(cat), k = rows.findIndex(r => r.s.i === s.i), lab = [cat.ag, t("km", cat.dist), isCanalD(cat.dist) ? "" : (cat.wet ? t("wet") : t("skin"))].filter(Boolean).join(" · ");
         return k < 0 ? `<div class="stat" style="--c:var(--buoy)"><div class="k">${esc(lab)}</div><div class="v">–</div><div class="s">${t("notInCat")}</div></div>`
           : `<div class="stat link" id="catCard" role="link" tabindex="0" style="--c:var(--buoy)"><div class="k">${esc(lab)}</div><div class="v">${t("top", Math.round(rows[k].rp) || 1)}</div>
             <div class="s">${k + 1} / ${total} · <a href="#/" onclick="return false">${t("showInRank")}</a></div></div>`; })()}
@@ -642,7 +646,7 @@ function renderSwimmer(s) {
   $("#slDist").onchange = e => { SL.dist = e.target.value; drawSL(); };
   drawSL();
   $("#back").onclick = () => { hl = s.i; go("#/"); };
-  const cat = $("#catCard"); if (cat) cat.onclick = () => { hl = s.i; go("#/"); };
+  const cc = $("#catCard"); if (cc) cc.onclick = () => { Object.assign(F, cat); store.set("filters", F); hl = s.i; go("#/"); };
   const drawM = () => { segment($("#metric"), [["pct", t("percentile")], ["pace", t("pace")]], metric, v => { metric = v; store.set("metric", v); drawM(); }); drawChart(s, groups); };
   drawM();
 }
