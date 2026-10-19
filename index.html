@@ -422,11 +422,13 @@ const t = (k, ...a) => { const v = T[lang][k]; return typeof v === "function" ? 
 
 const D = await (await fetch("data.json")).json();
 const RACES = D.races.map(([brand, year, stage, date, dist, wet, canal], i) => ({ i, brand, year, stage, date, dist, wet, canal }));
-// unnamed = 1: the result file had a club or heading where the name should be; the swim still counts for places
+// unnamed = 1: the result file had a club or heading where the name should be; 2: a masked or one-word name that
+// can't be matched across races (g, 2026-10-19). Either way the swim counts for places and club tables, but the
+// swimmer is left out of search, rankings and profiles. Names arrive already cased by the pipeline.
 // "AHMET YILMAZ" / "ahmet yılmaz" -> "Ahmet Yılmaz"; words already in mixed case ("McDonald") are kept
 const tc = n => String(n).split(/(\s+)/).map(w => w === w.toLocaleUpperCase("tr") || w === w.toLocaleLowerCase("tr")
   ? w.toLocaleLowerCase("tr").replace(/(^|[.\-'’(])(\p{L})/gu, (m, a, b) => a + b.toLocaleUpperCase("tr")) : w).join("");
-const SW = D.swimmers.map(([name, sex, clubs, variants, unnamed = 0, birth = null], i) => ({ i, name: unnamed ? t("unreadable") : tc(name), sex, clubs, variants: variants.map(tc), unnamed, birth, res: [] }));
+const SW = D.swimmers.map(([name, sex, clubs, variants, unnamed = 0, birth = null], i) => ({ i, name: unnamed === 1 ? t("unreadable") : tc(name), sex, clubs, variants: variants.map(tc), unnamed, birth, res: [] }));
 const CLUBS = (D.clubs || []).map((name, i) => ({ i, name }));
 const ALL = D.results.map(([s, r, ag, time, st, ps, ns, pa, na, c = -1]) => {
   const x = { s, r: RACES[r], ag, time, st, ps, ns, pa, na, c,
@@ -738,7 +740,8 @@ function renderRace(r) {
   const mine = rows.filter(x => SW[x.s].sex === raceSex).sort((a, b) => (a.ps ?? 1e9) - (b.ps ?? 1e9) || (a.time ?? 1e9) - (b.time ?? 1e9));
   const hasAg = mine.some(x => x.pa);
   if (!hasAg) raceCls = "all";
-  const line = x => `<tr class="go${x.time == null ? " out" : ""}" tabindex="0" data-s="${x.s}">`;
+  const line = x => SW[x.s].unnamed ? `<tr${x.time == null ? ` class="out"` : ""}>`
+    : `<tr class="go${x.time == null ? " out" : ""}" tabindex="0" data-s="${x.s}">`;
   const tail = x => `<td class="num mono">${x.time == null ? esc(x.st || t("dnf")) : fmtT(x.time)}</td><td class="num mono hide-sm">${fmtP(paceOf(x))}</td></tr>`;
   let body;
   if (raceCls === "all") body = `<div class="tablewrap"><table><thead><tr><th class="num">${t("place")}</th><th>${t("colName")}</th><th>${t("ageGroup")}</th><th class="num">${t("agPlace")}</th><th class="num">${t("colTime")}</th><th class="num hide-sm">${t("colPace")}</th></tr></thead>
@@ -888,7 +891,7 @@ function renderClub(cl) {
   ${ms.length ? `
   <div class="panel"><div class="phead"><h3>${t("medalists")}</h3><span class="sub">${bySw.length}</span></div><div class="tablewrap"><table>
     <thead><tr><th>${t("colSwim")}</th>${medalHead()}</tr></thead>
-    <tbody>${bySw.map(e => `<tr class="go" tabindex="0" data-s="${e.k}"><td class="who">${esc(SW[e.k].name)}</td>${medalCells(e)}</tr>`).join("")}</tbody></table></div></div>
+    <tbody>${bySw.map(e => `<tr${SW[e.k].unnamed ? "" : ` class="go" tabindex="0" data-s="${e.k}"`}><td class="who">${esc(SW[e.k].name)}</td>${medalCells(e)}</tr>`).join("")}</tbody></table></div></div>
   <div class="panel"><div class="phead"><h3>${t("recent")}</h3><span class="sub">${recent.length}</span></div><div class="tablewrap"><table>
     <thead><tr><th class="hide-sm">${t("colDate")}</th><th>${t("colRace")}</th><th>${t("colDist")}</th><th>${t("colSwim")}</th><th class="num">${t("place")}</th></tr></thead>
     <tbody>${recent.slice(0, recentN).map(({ x, p }) => `<tr class="go" tabindex="0" data-r="${x.r.i}"><td class="hide-sm">${dateTxt(x.r)}</td><td>${esc(x.r.brand)}${x.r.stage ? ` <span class="sub">${esc(x.r.stage)}</span>` : ""}<span class="sm">${dateTxt(x.r)}</span></td>
@@ -908,7 +911,7 @@ function go(h) { if (location.hash === h) route(); else location.hash = h; }
 function route() {
   const p = location.hash.replace(/^#\/?/, "").split("/");
   $("#tip").style.display = "none";
-  if (p[0] === "s" && SW[+p[1]]) view = { name: "swimmer", s: SW[+p[1]] };
+  if (p[0] === "s" && SW[+p[1]] && !SW[+p[1]].unnamed) view = { name: "swimmer", s: SW[+p[1]] };
   else if (p[0] === "races") view = { name: "races" };
   else if (p[0] === "clubs") view = { name: "clubs" };
   else if (p[0] === "k" && CLUBS[+p[1]]) { view = { name: "club", c: CLUBS[+p[1]] }; recentN = 30; }
