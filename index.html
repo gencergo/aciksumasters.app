@@ -16,7 +16,7 @@
   --bg: #f3f6f8; --surface: #ffffff; --ink: #0f2533; --ink-2: #4a5d6a; --ink-3: #6f808c;
   --line: #d9e1e7; --sea: #0e5a7a; --sea-ink: #ffffff; --buoy: #e8641e; --sel: #e3eef4; --grid: #e6ecf0;
   --gold: #b88a00; --silver: #7f8c95; --bronze: #a0592f;
-  --d1000: #2a78d6; --d2000: #eb6834; --d3000: #1baf7a; --d5000: #eda100;
+  --d1000: #2a78d6; --d1500: #0e93a6; --d2000: #eb6834; --d3000: #1baf7a; --d5000: #eda100;
   --d6000: #e87ba4; --d10000: #008300; --d6500: #6250d6; --d4500: #e34948; --d7000: #6d4c41;
   --pA: #2a78d6; --pB: #eb6834;
   --display: "Barlow Condensed", "Arial Narrow", sans-serif;
@@ -27,14 +27,14 @@
   --bg: #0b1820; --surface: #11222d; --ink: #e6eef3; --ink-2: #a9bac5; --ink-3: #8a9daa;
   --line: #22394a; --sea: #5fb3d9; --sea-ink: #0b1820; --buoy: #f07a3a; --sel: #173445; --grid: #1a2e3b;
   --gold: #e0b42a; --silver: #b3bfc7; --bronze: #c9825a;
-  --d1000: #3987e5; --d2000: #d95926; --d3000: #199e70; --d5000: #c98500;
+  --d1000: #3987e5; --d1500: #2bb3c4; --d2000: #d95926; --d3000: #199e70; --d5000: #c98500;
   --d6000: #d55181; --d10000: #2f9a2f; --d6500: #9085e9; --d4500: #e66767; --d7000: #8d6e63;
   --pA: #3987e5; --pB: #d95926; color-scheme: dark } }
 :root[data-theme="dark"] {
   --bg: #0b1820; --surface: #11222d; --ink: #e6eef3; --ink-2: #a9bac5; --ink-3: #8a9daa;
   --line: #22394a; --sea: #5fb3d9; --sea-ink: #0b1820; --buoy: #f07a3a; --sel: #173445; --grid: #1a2e3b;
   --gold: #e0b42a; --silver: #b3bfc7; --bronze: #c9825a;
-  --d1000: #3987e5; --d2000: #d95926; --d3000: #199e70; --d5000: #c98500;
+  --d1000: #3987e5; --d1500: #2bb3c4; --d2000: #d95926; --d3000: #199e70; --d5000: #c98500;
   --d6000: #d55181; --d10000: #2f9a2f; --d6500: #9085e9; --d4500: #e66767; --d7000: #8d6e63;
   --pA: #3987e5; --pB: #d95926; color-scheme: dark }
 * { box-sizing: border-box }
@@ -340,9 +340,9 @@ const T = {
     perDist: "Mesafe bazında", headToHead: "Ortak yarışlar", ahead: (a, n) => `${a}, ${n} ortak yarışta öndeydi`, noShared: "Ortak yarış yok.",
     allRaces: "Tüm yarışlar", finishers: "bitiren", place: "Sıra", agPlace: "YG sırası", dnf: "Bitirmedi",
     foot1: "Sıralamadaki yüzdelik, yüzücünün seçili filtredeki (cinsiyet, yaş grubu, mesafe, kıyafet, yıllar) sırasıdır: sıra ÷ yüzücü sayısı; birinci en küçük değeri, sonuncu %100’ü alır. Sıra, aşağıdaki yarış puanına göre belirlenir. Yarış yüzdeliği: bir yüzücünün yaş grubundaki yeri, (sıra − 0,5) ÷ bitiren sayısı. 10 kişide 1. olmak ilk %5 demektir. Küçük gruplar kendiliğinden ortaya çekilir: 2 kişide 1. olmak ilk %25, tek kişilik grupta yüzmek %50 sayılır. Yarışlar arası puan, bitiren sayısının kareköküyle ağırlıklı ortalamadır: 4 kişilik grup 2, 25 kişilik grup 5, 100 kişilik grup 10 ağırlık alır. Kalabalık bir gruptaki sonuç daha çok sayılır, ama tek bir dev yarış ortalamayı tek başına belirlemez. Mayo ve neopren sonuçları ayrı hesaplanır. Puan ilk yarıştan itibaren gerçek sonucu gösterir; yarış sayısı yanında yazar.",
-    foot2: "Neopren ve mayo kategorileri aynı yarışta ayrı yarış sayılır. Sıralar süreden yeniden hesaplanır. Yaş grupları organizatörün yayımladığı gibidir. 1, 2, 3, 5, 6 ve 10 km dışındaki yarışlar, Boğaziçi ve Çanakkale geçişleri hariç, dahil edilmedi. Boğaziçi 2026 PDF'lerinde soyadları gizliydi; tam adlar organizatörün sonuç sayfasından (RaceResult) alındı. Gizli kalan ya da tek kelimelik isimler sıra ve kulüp tablolarında sayılır, ama yüzücü sayfası ve aramada yer almaz.",
+    foot2: "Neopren ve mayo kategorileri aynı yarışta ayrı yarış sayılır. Sıralar süreden yeniden hesaplanır. Yaş grupları organizatörün yayımladığı gibidir. 1, 1,5, 2, 3, 5, 6 ve 10 km dışındaki yarışlar, Boğaziçi ve Çanakkale geçişleri hariç, dahil edilmedi. Boğaziçi 2026 PDF'lerinde soyadları gizliydi; tam adlar organizatörün sonuç sayfasından (RaceResult) alındı. Gizli kalan ya da tek kelimelik isimler sıra ve kulüp tablolarında sayılır, ama yüzücü sayfası ve aramada yer almaz.",
     coverage: (r, s) => `${r} yarış, ${s} yüzücü. Kaynak: organizatörlerin yayımladığı sonuç dosyaları.`,
-    km: d => d === 6500 ? "Boğaziçi" : d === 4500 ? "Çanakkale" : d === 7000 ? "Meis–Kaş" : `${d / 1000} km`,
+    km: d => d === 6500 ? "Boğaziçi" : d === 4500 ? "Çanakkale" : d === 7000 ? "Meis–Kaş" : `${String(d / 1000).replace(".", ",")} km`,
     navClubs: "Kulüpler", byYears: "Yıllara göre", byEvents: "Etkinliklere göre", eventsWord: "etkinlik", racesWord: "yarış", classAll: "Genel klasman", classAg: "Yaş grupları", backRaces: "Yarışlara dön", matrixH: "Etkinlikler (yıl × etkinlik)", matrixNote: "Kalın: madalya · gri: yarış katılımı", starts: "katılım", moreClubs: n => `${n} kulüp daha göster`, moreMed: n => `${n} madalya daha göster`, clubTable: "Kulüp madalya tablosu", medalType: "Madalya", mSex: "Genel (K/E ilk 3)", mAg: "Yaş grubu ilk 3",
     series: "Etkinlik", all: "Tümü", both: "Tümü", gold: "Altın", silver: "Gümüş", bronze: "Bronz", total: "Toplam",
     medalists: "Madalyalı yüzücü", viewAs: "Görünüm", vTable: "Madalya tablosu", vYear: "Yıllara göre", vEvent: "Etkinliklere göre",
@@ -372,7 +372,7 @@ const T = {
     perDist: "By distance", headToHead: "Shared races", ahead: (a, n) => `${a} finished ahead in ${n} shared races`, noShared: "No shared races.",
     allRaces: "All races", finishers: "finishers", place: "Place", agPlace: "AG place", dnf: "Did not finish",
     foot1: "The percentile in the rankings is the swimmer's position in the selected filter (sex, age group, distance, suit, years): rank ÷ number of swimmers, so first gets the smallest value and last gets 100%. The order comes from the race rating below. Race percentile: where a swimmer finished in their age group, (place − 0.5) ÷ finishers. 1st of 10 is top 5%. Small groups pull towards the middle on their own: 1st of 2 is top 25%, and a group of one is 50%. The rating across races is an average weighted by the square root of the finishers: a group of 4 weighs 2, 25 weighs 5, 100 weighs 10. A result in a big group counts more, but one huge race doesn't decide the average alone. Swimsuit and wetsuit results are rated apart. The rating shows the real result from the first race on; the race count sits next to it.",
-    foot2: "Wetsuit and swimsuit categories in one race are separate races. Places are recomputed from times. Age groups are as each organiser published them. Races at distances other than 1, 2, 3, 5, 6 and 10 km are left out, except the Boğaziçi and Çanakkale crossings. Boğaziçi 2026 PDFs masked surnames; full names come from the organiser's results page (RaceResult). Names that stay masked or have one word count in places and club tables but get no swimmer page or search entry.",
+    foot2: "Wetsuit and swimsuit categories in one race are separate races. Places are recomputed from times. Age groups are as each organiser published them. Races at distances other than 1, 1.5, 2, 3, 5, 6 and 10 km are left out, except the Boğaziçi and Çanakkale crossings. Boğaziçi 2026 PDFs masked surnames; full names come from the organiser's results page (RaceResult). Names that stay masked or have one word count in places and club tables but get no swimmer page or search entry.",
     coverage: (r, s) => `${r} races, ${s} swimmers. Source: organisers' published result files.`,
     km: d => d === 6500 ? "Boğaziçi" : d === 4500 ? "Çanakkale" : d === 7000 ? "Meis–Kaş" : `${d / 1000} km`,
     navClubs: "Clubs", byYears: "By year", byEvents: "By event", eventsWord: "events", racesWord: "races", classAll: "Overall", classAg: "Age groups", backRaces: "Back to races", matrixH: "Events (year × event)", matrixNote: "Bold: medals · grey: race starts", starts: "starts", moreClubs: n => `Show ${n} more`, moreMed: n => `Show ${n} more`, clubTable: "Club medal table", medalType: "Medals", mSex: "Overall (W/M top 3)", mAg: "Age-group top 3",
@@ -404,9 +404,9 @@ const T = {
     perDist: "По дистанциям", headToHead: "Общие заплывы", ahead: (a, n) => `${a} финишировал(а) впереди в ${n} общих заплывах`, noShared: "Общих заплывов нет.",
     allRaces: "Все заплывы", finishers: "финишировавших", place: "Место", agPlace: "Место в ВГ", dnf: "Не финишировал(а)",
     foot1: "Процентиль в рейтинге — это позиция пловца внутри выбранного фильтра (пол, возрастная группа, дистанция, костюм, годы): место ÷ число пловцов, поэтому у первого наименьшее значение, у последнего ровно 100%. Порядок задаёт рейтинг по заплывам. Процентиль заплыва: (место − 0,5) ÷ число финишировавших в возрастной группе; 1-е место из 10 — топ 5%, 1-е из 2 — топ 25%, единственный финишер — 50%. Рейтинг по нескольким заплывам — среднее, взвешенное по квадратному корню из числа финишировавших: группа из 4 весит 2, из 25 — 5, из 100 — 10. Результаты в гидрокостюме и без него считаются отдельно. Рейтинг отражает реальный результат с первого заплыва.",
-    foot2: "Категории с гидрокостюмом и без него в одном заплыве считаются разными заплывами. Места пересчитаны по времени. Возрастные группы — как их опубликовал организатор. Дистанции кроме 1, 2, 3, 5, 6 и 10 км не учитываются, за исключением переплывов Босфора и Дарданелл. В PDF Boğaziçi 2026 фамилии скрыты; полные имена взяты со страницы результатов организатора (RaceResult). Скрытые или однословные имена учитываются в местах и клубном зачёте, но без страницы пловца и поиска.",
+    foot2: "Категории с гидрокостюмом и без него в одном заплыве считаются разными заплывами. Места пересчитаны по времени. Возрастные группы — как их опубликовал организатор. Дистанции кроме 1, 1,5, 2, 3, 5, 6 и 10 км не учитываются, за исключением переплывов Босфора и Дарданелл. В PDF Boğaziçi 2026 фамилии скрыты; полные имена взяты со страницы результатов организатора (RaceResult). Скрытые или однословные имена учитываются в местах и клубном зачёте, но без страницы пловца и поиска.",
     coverage: (r, s) => `${r} заплывов, ${s} пловцов. Источник: протоколы организаторов.`,
-    km: d => d === 6500 ? "Босфор" : d === 4500 ? "Дарданеллы" : d === 7000 ? "Мейс–Каш" : `${d / 1000} км`,
+    km: d => d === 6500 ? "Босфор" : d === 4500 ? "Дарданеллы" : d === 7000 ? "Мейс–Каш" : `${String(d / 1000).replace(".", ",")} км`,
     navClubs: "Клубы", byYears: "По годам", byEvents: "По соревнованиям", eventsWord: "соревнований", racesWord: "заплывов", classAll: "Абсолют", classAg: "Возрастные группы", backRaces: "Назад к заплывам", matrixH: "Соревнования (год × соревнование)", matrixNote: "Жирным: медали · серым: старты", starts: "стартов", moreClubs: n => `Показать ещё ${n}`, moreMed: n => `Показать ещё ${n}`, clubTable: "Медальный зачёт клубов", medalType: "Медали", mSex: "Абсолют (Ж/М топ-3)", mAg: "Топ-3 возрастной группы",
     series: "Соревнование", all: "Все", both: "Все", gold: "Золото", silver: "Серебро", bronze: "Бронза", total: "Всего",
     medalists: "Призёры", viewAs: "Вид", vTable: "Медальный зачёт", vYear: "По годам", vEvent: "По соревнованиям",
@@ -439,7 +439,7 @@ const ALL = D.results.map(([s, r, ag, time, st, ps, ns, pa, na, c = -1]) => {
 });
 SW.forEach(s => s.res.sort((a, b) => (b.r.date || "").localeCompare(a.r.date || "") || b.r.year - a.r.year));
 const MAXY = Math.max(...RACES.map(r => r.year));
-const DISTS = { open: [1000, 2000, 3000, 5000, 6000, 10000], canal: [6500, 4500, 7000] };
+const DISTS = { open: [1000, 1500, 2000, 3000, 5000, 6000, 10000], canal: [6500, 4500, 7000] };
 DISTS.all = [...DISTS.open, ...DISTS.canal];
 const isCanalD = d => DISTS.canal.includes(+d);
 // mode "all" (default) mixes open water and strait crossings; the other two narrow to one kind
@@ -520,7 +520,7 @@ function poolFor(opts = {}) {
 }
 const agStart = a => { const m = /(\d+)/.exec(a); return m ? +m[1] : 999; };
 function drawFilters() {
-  segment($("#fMode"), [["all", t("all")], ["open", t("open")], ["canal", t("canal")]], F.mode, v => { F.mode = v; if (!DISTS[v].includes(+F.dist)) F.dist = DISTS[v][v === "canal" ? 0 : 3];
+  segment($("#fMode"), [["all", t("all")], ["open", t("open")], ["canal", t("canal")]], F.mode, v => { F.mode = v; if (!DISTS[v].includes(+F.dist)) F.dist = v === "canal" ? DISTS.canal[0] : 5000;
     if (KF.dist !== "all" && !DISTS[v].includes(+KF.dist)) KF.dist = "all"; if (KF.brand !== "all" && !brandsFor().includes(KF.brand)) KF.brand = "all"; store.set("clubF", KF);
     if (view.name === "race") { store.set("filters", F); go("#/races"); } else changed(); });
   segment($("#fSex"), [["F", t("F")], ["M", t("M")]], F.sex, v => { F.sex = v; changed(); });
