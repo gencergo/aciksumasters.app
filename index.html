@@ -156,6 +156,7 @@ tr.out td { color: var(--ink-3) }
 .legend { display: flex; flex-wrap: wrap; gap: 6px 14px; padding: 0 16px 6px; font-size: 13px; color: var(--ink-2) }
 .legend span { display: inline-flex; align-items: center; gap: 6px }
 .legend i { width: 14px; height: 3px; border-radius: 2px; background: var(--c) }
+.legend i.dash { background: repeating-linear-gradient(90deg, var(--c) 0 5px, transparent 5px 8px) }
 .tip { position: absolute; pointer-events: none; background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
   box-shadow: 0 6px 18px rgb(0 0 0 / .16); padding: 8px 10px; font-size: 13px; max-width: 280px; z-index: 10; display: none }
 .tip b { display: block; margin-bottom: 2px }
@@ -323,7 +324,7 @@ const T = {
     title: "Türkiye Açık Su Masters Yüzücü Veritabanı", titleShort: "Açık Su Masters", method: "Yöntem ve kaynaklar", tagline: "Yaş grubu sıralamaları, yüzücü istatistikleri ve karşılaştırma",
     navRank: "Sıralama", navCompare: "Karşılaştır", navRaces: "Yarışlar", searchPh: "Yüzücü ara…",
     open: "Açık su", canal: "Boğaz geçişleri", sex: "Cinsiyet", F: "Kadın", M: "Erkek", ageGroup: "Yaş grubu", distance: "Mesafe",
-    suit: "Kıyafet", skin: "Mayolu", wet: "Neopren", years: "Yıllar", allYears: "Tümü", last3: "Son 3 yıl", lastN: n => `Son ${n} yıl`, show: "Göster",
+    suit: "Kıyafet", skin: "Mayo", wet: "Neopren", years: "Yıllar", allYears: "Tümü", last3: "Son 3 yıl", lastN: n => `Son ${n} yıl`, show: "Göster",
     topN: p => `İlk %${p}`, everyone: "Herkes", filters: "Filtreler", done: "Tamam", change: "Değiştir",
     colMedals: "Madalya (YG)", inCat: "Bu kategoride", notInCat: "Bu kategoride yarışı yok", showInRank: "sıralamada göster", unreadable: "İsmi okunamayan yüzücü", yearsWord: "yıl", classification: "Klasman", filtersLocked: "Yüzücü sayfasında filtreler kapalı. Değiştirmek için sıralamaya dönün.",
     rankHint: (n, r) => `Bu grupta <b>${r}</b> yarışta <b>${n}</b> yüzücü. Madalya: bu yarışlarda yaş grubu ilk 3.`,
@@ -338,8 +339,8 @@ const T = {
     attendance: "Katılım", radarNote: "Dış halka daha iyi: yaş grubu yüzdeliği (ilk %0 = dış kenar). Katılım: yarış sayısı, en çok yarışana göre.",
     perDist: "Mesafe bazında", headToHead: "Ortak yarışlar", ahead: (a, n) => `${a}, ${n} ortak yarışta öndeydi`, noShared: "Ortak yarış yok.",
     allRaces: "Tüm yarışlar", finishers: "bitiren", place: "Sıra", agPlace: "YG sırası", dnf: "Bitirmedi",
-    foot1: "Sıralamadaki yüzdelik, yüzücünün seçili filtredeki (cinsiyet, yaş grubu, mesafe, kıyafet, yıllar) sırasıdır: sıra ÷ yüzücü sayısı; birinci en küçük değeri, sonuncu %100’ü alır. Sıra, aşağıdaki yarış puanına göre belirlenir. Yarış yüzdeliği: bir yüzücünün sahadaki yeri, (sıra − 0,5) ÷ bitiren sayısı. 10 kişide 1. olmak ilk %5 demektir. Yarışlar arası puan, saha büyüklüğüne göre ağırlıklı ortalamadır (√bitiren): kalabalık bir yaş grubundaki sonuç, iki kişilik bir gruptakinden daha çok sayılır. Ortalamaya ayrıca bir “orta sıra” sonucu (4 kişide %50) eklenir; böylece tek bir şanslı yarış, uzun ve istikrarlı bir geçmişin önüne geçemez.",
-    foot2: "Neopren ve mayolu kategoriler aynı yarışta ayrı yarış sayılır. Sıralar süreden yeniden hesaplanır. Yaş grupları organizatörün yayımladığı gibidir. 1, 2, 3, 5, 6 ve 10 km dışındaki yarışlar, Boğaziçi ve Çanakkale geçişleri hariç, dahil edilmedi. Boğaziçi 2026 PDF'lerinde soyadları gizliydi; tam adlar organizatörün sonuç sayfasından (RaceResult) alındı. Gizli kalan ya da tek kelimelik isimler sıra ve kulüp tablolarında sayılır, ama yüzücü sayfası ve aramada yer almaz.",
+    foot1: "Sıralamadaki yüzdelik, yüzücünün seçili filtredeki (cinsiyet, yaş grubu, mesafe, kıyafet, yıllar) sırasıdır: sıra ÷ yüzücü sayısı; birinci en küçük değeri, sonuncu %100’ü alır. Sıra, aşağıdaki yarış puanına göre belirlenir. Yarış yüzdeliği: bir yüzücünün yaş grubundaki yeri, (sıra − 0,5) ÷ bitiren sayısı. 10 kişide 1. olmak ilk %5 demektir. Küçük gruplar kendiliğinden ortaya çekilir: 2 kişide 1. olmak ilk %25, tek kişilik grupta yüzmek %50 sayılır. Yarışlar arası puan, bitiren sayısının kareköküyle ağırlıklı ortalamadır: 4 kişilik grup 2, 25 kişilik grup 5, 100 kişilik grup 10 ağırlık alır. Kalabalık bir gruptaki sonuç daha çok sayılır, ama tek bir dev yarış ortalamayı tek başına belirlemez. Mayo ve neopren sonuçları ayrı hesaplanır. Puan ilk yarıştan itibaren gerçek sonucu gösterir; yarış sayısı yanında yazar.",
+    foot2: "Neopren ve mayo kategorileri aynı yarışta ayrı yarış sayılır. Sıralar süreden yeniden hesaplanır. Yaş grupları organizatörün yayımladığı gibidir. 1, 2, 3, 5, 6 ve 10 km dışındaki yarışlar, Boğaziçi ve Çanakkale geçişleri hariç, dahil edilmedi. Boğaziçi 2026 PDF'lerinde soyadları gizliydi; tam adlar organizatörün sonuç sayfasından (RaceResult) alındı. Gizli kalan ya da tek kelimelik isimler sıra ve kulüp tablolarında sayılır, ama yüzücü sayfası ve aramada yer almaz.",
     coverage: (r, s) => `${r} yarış, ${s} yüzücü. Kaynak: organizatörlerin yayımladığı sonuç dosyaları.`,
     km: d => d === 6500 ? "Boğaziçi" : d === 4500 ? "Çanakkale" : d === 7000 ? "Meis–Kaş" : `${d / 1000} km`,
     navClubs: "Kulüpler", byYears: "Yıllara göre", byEvents: "Etkinliklere göre", eventsWord: "etkinlik", racesWord: "yarış", classAll: "Genel klasman", classAg: "Yaş grupları", backRaces: "Yarışlara dön", matrixH: "Etkinlikler (yıl × etkinlik)", matrixNote: "Kalın: madalya · gri: yarış katılımı", starts: "katılım", moreClubs: n => `${n} kulüp daha göster`, moreMed: n => `${n} madalya daha göster`, clubTable: "Kulüp madalya tablosu", medalType: "Madalya", mSex: "Genel (K/E ilk 3)", mAg: "Yaş grubu ilk 3",
@@ -349,13 +350,13 @@ const T = {
     heatHint: "Hücreler toplam madalya sayısı; üzerine gelince altın / gümüş / bronz dağılımı görünür.",
     noMedals: "Bu seçim için madalya yok.", noClubData: "Boğaziçi ve Çanakkale sonuç dosyalarında kulüp bilgisi yok, bu yüzden boğaz geçişleri için kulüp tablosu boş. Açık su sekmesine geçin.", backClubs: "Kulüplere dön", byYear: "Yıllara göre", byEvent: "Etkinliklere göre",
     clubMeta: (sw, st) => `${sw} yüzücü · ${st} yarış katılımı`, year: "Yıl", colSwim: "Yüzücü", recent: "Madalyalar",
-    clubFoot: "Madalya, sonucun yayımlandığı yarıştaki kulübe yazılır. Benzer yazılan kulüp adları tek kulüpte birleştirildi; “Ferdi” sayılmaz. Neopren ve mayolu kategoriler ayrı yarış olduğu için ayrı madalya verir.",
+    clubFoot: "Madalya, sonucun yayımlandığı yarıştaki kulübe yazılır. Benzer yazılan kulüp adları tek kulüpte birleştirildi; “Ferdi” sayılmaz. Neopren ve mayo kategorileri ayrı yarış olduğu için ayrı madalya verir.",
   },
   en: {
     title: "Turkish Open Water Masters Swimmers Database", titleShort: "Open Water Masters", method: "Method and sources", tagline: "Age-group rankings, swimmer stats and head-to-head",
     navRank: "Rankings", navCompare: "Compare", navRaces: "Races", searchPh: "Search swimmers…",
     open: "Open water", canal: "Strait crossings", sex: "Sex", F: "Women", M: "Men", ageGroup: "Age group", distance: "Distance",
-    suit: "Suit", skin: "No wetsuit", wet: "Wetsuit", years: "Years", allYears: "All", last3: "Last 3 years", lastN: n => n === 1 ? "Last year" : `Last ${n} years`, show: "Show",
+    suit: "Suit", skin: "Swimsuit", wet: "Wetsuit", years: "Years", allYears: "All", last3: "Last 3 years", lastN: n => n === 1 ? "Last year" : `Last ${n} years`, show: "Show",
     topN: p => `Top ${p}%`, everyone: "Everyone", filters: "Filters", done: "Done", change: "Change",
     colMedals: "Medals (AG)", inCat: "In this category", notInCat: "No races in this category", showInRank: "show in rankings", unreadable: "Unreadable name", yearsWord: "years", classification: "Classification", filtersLocked: "Filters are off on a swimmer page. Go back to the rankings to change them.",
     rankHint: (n, r) => `<b>${n}</b> swimmers across <b>${r}</b> races in this group. Medals: age-group top 3 in these races.`,
@@ -370,8 +371,8 @@ const T = {
     attendance: "Attendance", radarNote: "Outer ring is better: age-group percentile (top 0% = outer edge). Attendance: races swum, relative to whoever swam more.",
     perDist: "By distance", headToHead: "Shared races", ahead: (a, n) => `${a} finished ahead in ${n} shared races`, noShared: "No shared races.",
     allRaces: "All races", finishers: "finishers", place: "Place", agPlace: "AG place", dnf: "Did not finish",
-    foot1: "The percentile in the rankings is the swimmer's position in the selected filter (sex, age group, distance, suit, years): rank ÷ number of swimmers, so first gets the smallest value and last gets 100%. The order comes from the race rating below. Race percentile: where a swimmer finished in the field, (place − 0.5) ÷ finishers. 1st of 10 is top 5%. The rating across races is a field-size-weighted average (√finishers), so a result in a big age group counts more than one in a group of two. One mid-field result (top 50% in a field of 4) is mixed in, so a single lucky swim can't outrank a long, consistent record.",
-    foot2: "Wetsuit and no-wetsuit categories in one race are separate races. Places are recomputed from times. Age groups are as each organiser published them. Races at distances other than 1, 2, 3, 5, 6 and 10 km are left out, except the Boğaziçi and Çanakkale crossings. Boğaziçi 2026 PDFs masked surnames; full names come from the organiser's results page (RaceResult). Names that stay masked or have one word count in places and club tables but get no swimmer page or search entry.",
+    foot1: "The percentile in the rankings is the swimmer's position in the selected filter (sex, age group, distance, suit, years): rank ÷ number of swimmers, so first gets the smallest value and last gets 100%. The order comes from the race rating below. Race percentile: where a swimmer finished in their age group, (place − 0.5) ÷ finishers. 1st of 10 is top 5%. Small groups pull towards the middle on their own: 1st of 2 is top 25%, and a group of one is 50%. The rating across races is an average weighted by the square root of the finishers: a group of 4 weighs 2, 25 weighs 5, 100 weighs 10. A result in a big group counts more, but one huge race doesn't decide the average alone. Swimsuit and wetsuit results are rated apart. The rating shows the real result from the first race on; the race count sits next to it.",
+    foot2: "Wetsuit and swimsuit categories in one race are separate races. Places are recomputed from times. Age groups are as each organiser published them. Races at distances other than 1, 2, 3, 5, 6 and 10 km are left out, except the Boğaziçi and Çanakkale crossings. Boğaziçi 2026 PDFs masked surnames; full names come from the organiser's results page (RaceResult). Names that stay masked or have one word count in places and club tables but get no swimmer page or search entry.",
     coverage: (r, s) => `${r} races, ${s} swimmers. Source: organisers' published result files.`,
     km: d => d === 6500 ? "Boğaziçi" : d === 4500 ? "Çanakkale" : d === 7000 ? "Meis–Kaş" : `${d / 1000} km`,
     navClubs: "Clubs", byYears: "By year", byEvents: "By event", eventsWord: "events", racesWord: "races", classAll: "Overall", classAg: "Age groups", backRaces: "Back to races", matrixH: "Events (year × event)", matrixNote: "Bold: medals · grey: race starts", starts: "starts", moreClubs: n => `Show ${n} more`, moreMed: n => `Show ${n} more`, clubTable: "Club medal table", medalType: "Medals", mSex: "Overall (W/M top 3)", mAg: "Age-group top 3",
@@ -381,7 +382,7 @@ const T = {
     heatHint: "Cells show total medals; hover for the gold / silver / bronze split.",
     noMedals: "No medals for this selection.", noClubData: "The Boğaziçi and Çanakkale result files list no clubs, so there is no club table for strait crossings. Switch to Open water.", backClubs: "Back to clubs", byYear: "By year", byEvent: "By event",
     clubMeta: (sw, st) => `${sw} swimmers · ${st} race starts`, year: "Year", colSwim: "Swimmer", recent: "Medals",
-    clubFoot: "A medal goes to the club the swimmer was listed under in that race. Similar spellings of a club name are merged into one club; “Ferdi” (unattached) isn't counted. Wetsuit and no-wetsuit categories are separate races, so each awards its own medals.",
+    clubFoot: "A medal goes to the club the swimmer was listed under in that race. Similar spellings of a club name are merged into one club; “Ferdi” (unattached) isn't counted. Wetsuit and swimsuit categories are separate races, so each awards its own medals.",
   },
   ru: {
     title: "База пловцов-мастерс Турции", titleShort: "Пловцы-мастерс", method: "Методика и источники", tagline: "Рейтинги по возрастным группам, статистика пловцов",
@@ -402,7 +403,7 @@ const T = {
     attendance: "Участие", radarNote: "",
     perDist: "По дистанциям", headToHead: "Общие заплывы", ahead: (a, n) => `${a} финишировал(а) впереди в ${n} общих заплывах`, noShared: "Общих заплывов нет.",
     allRaces: "Все заплывы", finishers: "финишировавших", place: "Место", agPlace: "Место в ВГ", dnf: "Не финишировал(а)",
-    foot1: "Процентиль в рейтинге — это позиция пловца внутри выбранного фильтра (пол, возрастная группа, дистанция, костюм, годы): место ÷ число пловцов, поэтому у первого наименьшее значение, у последнего ровно 100%. Порядок задаёт рейтинг по заплывам. Процентиль заплыва: (место − 0,5) ÷ число финишировавших; 1-е место из 10 — топ 5%. Рейтинг по нескольким заплывам — среднее, взвешенное по размеру группы (√финишировавших), поэтому результат в большой группе весит больше, чем в группе из двух. Добавляется один средний результат (топ 50% в группе из 4), чтобы один удачный заплыв не обгонял долгую стабильную историю.",
+    foot1: "Процентиль в рейтинге — это позиция пловца внутри выбранного фильтра (пол, возрастная группа, дистанция, костюм, годы): место ÷ число пловцов, поэтому у первого наименьшее значение, у последнего ровно 100%. Порядок задаёт рейтинг по заплывам. Процентиль заплыва: (место − 0,5) ÷ число финишировавших в возрастной группе; 1-е место из 10 — топ 5%, 1-е из 2 — топ 25%, единственный финишер — 50%. Рейтинг по нескольким заплывам — среднее, взвешенное по квадратному корню из числа финишировавших: группа из 4 весит 2, из 25 — 5, из 100 — 10. Результаты в гидрокостюме и без него считаются отдельно. Рейтинг отражает реальный результат с первого заплыва.",
     foot2: "Категории с гидрокостюмом и без него в одном заплыве считаются разными заплывами. Места пересчитаны по времени. Возрастные группы — как их опубликовал организатор. Дистанции кроме 1, 2, 3, 5, 6 и 10 км не учитываются, за исключением переплывов Босфора и Дарданелл. В PDF Boğaziçi 2026 фамилии скрыты; полные имена взяты со страницы результатов организатора (RaceResult). Скрытые или однословные имена учитываются в местах и клубном зачёте, но без страницы пловца и поиска.",
     coverage: (r, s) => `${r} заплывов, ${s} пловцов. Источник: протоколы организаторов.`,
     km: d => d === 6500 ? "Босфор" : d === 4500 ? "Дарданеллы" : d === 7000 ? "Мейс–Каш" : `${d / 1000} км`,
@@ -454,10 +455,9 @@ const fmtP = p => { if (p == null) return "–"; const m = Math.floor(p / 60), s
 const pctTxt = p => p == null ? "–" : (p < 1 ? "<1" : Math.round(p));
 const dateTxt = r => r.date ? new Date(r.date + "T12:00").toLocaleDateString({ tr: "tr-TR", en: "en-GB", ru: "ru-RU" }[lang], { day: "numeric", month: "short", year: "numeric" }) : String(r.year);
 
-/* Rating = field-weighted, shrunk average. Each result weighs √(finishers in its age group), so a
-   2-person group counts far less than a 40-person one; then one imaginary mid-field result (top 50% in
-   a field of 4) is mixed in, so a single lucky swim can't outrank a long consistent record. */
-const PRIOR_W = Math.sqrt(4), PRIOR = 50;
+/* Rating = field-weighted average. Each result weighs √(finishers in its age group), so a 2-person group
+   counts far less than a 40-person one. No imaginary mid-field result is mixed in (g, 2026-10-19): a swimmer
+   sees their real slice from the first race; small fields already pull towards 50% through (place − 0.5) / n. */
 function score(list, key = "pctA", nkey = "na") {
   let w = 0, s = 0, best = null, n = 0;
   for (const x of list) {
@@ -466,7 +466,7 @@ function score(list, key = "pctA", nkey = "na") {
     if (v == null) continue;
     const k = Math.sqrt(f); w += k; s += k * v; n++; best = best == null ? v : Math.min(best, v);
   }
-  return w ? { avg: (s + PRIOR_W * PRIOR) / (w + PRIOR_W), raw: s / w, best, n } : null;
+  return w ? { avg: s / w, best, n } : null;
 }
 const distKey = r => r.dist; // canal distances are unique (6500 Boğaziçi, 4500 Çanakkale, 7000 Meis–Kaş)
 
@@ -594,11 +594,13 @@ function bindRows() {
 }
 
 /* ---------- swimmer ---------- */
+// swimsuit and wetsuit are different races, so a distance gets one group per suit (g, 2026-10-19)
 function groupByDist(res) {
   const m = new Map();
-  for (const x of res) { const k = distKey(x.r); if (!m.has(k)) m.set(k, []); m.get(k).push(x); }
-  return [...m].sort((a, b) => (a[1][0].r.canal - b[1][0].r.canal) || a[0] - b[0]);
+  for (const x of res) { const k = x.r.canal ? `${distKey(x.r)}` : `${distKey(x.r)}-${x.r.wet}`; if (!m.has(k)) m.set(k, { d: x.r.dist, wet: x.r.canal ? 0 : x.r.wet, canal: x.r.canal, list: [] }); m.get(k).list.push(x); }
+  return [...m.values()].sort((a, b) => a.canal - b.canal || a.d - b.d || a.wet - b.wet);
 }
+const groupLab = g => t("km", g.d) + (g.canal ? "" : " · " + t(g.wet ? "wet" : "skin"));
 const medal = p => p && p <= 3 ? `<span class="medal m${p}" aria-label="${p}">${p}</span>` : "";
 const SL = { s: -1, brand: "all", dist: "all" }; // race-list filters on a swimmer page, reset per swimmer
 function renderSwimmer(s) {
@@ -617,8 +619,8 @@ function renderSwimmer(s) {
           : `<div class="stat link" id="catCard" role="link" tabindex="0" style="--c:var(--buoy)"><div class="k">${esc(lab)}</div><div class="v">${t("top", Math.round(rows[k].rp) || 1)}</div>
             <div class="s">${k + 1} / ${total} · <a href="#/" onclick="return false">${t("showInRank")}</a></div></div>`; })()}
       <div class="stat"><div class="k">${t("totalRaces")}</div><div class="v">${s.res.length}</div><div class="s">${new Set(s.res.map(x => x.r.year)).size} ${t("yearsWord")}</div></div>
-      ${groups.map(([d, list]) => { const sc = score(list); return `<div class="stat" style="--c:${dcol(d)}"><div class="k">${t("km", d)}</div>
-        <div class="v">${sc ? t("top", pctTxt(sc.raw)) : "–"}</div><div class="s">${list.length} ${list.length === 1 ? t("race") : t("races")}${sc ? ` · ${t("best")} ${t("top", pctTxt(sc.best))}` : ""}</div></div>`; }).join("")}
+      ${groups.map(({ d, list, ...g }) => { const sc = score(list); return `<div class="stat" style="--c:${dcol(d)}"><div class="k">${esc(groupLab({ d, ...g }))}</div>
+        <div class="v">${sc ? t("top", pctTxt(sc.avg)) : "–"}</div><div class="s">${list.length} ${list.length === 1 ? t("race") : t("races")}${sc ? ` · ${t("best")} ${t("top", pctTxt(sc.best))}` : ""}</div></div>`; }).join("")}
     </div></div></div>
   <div class="panel"><div class="phead"><h3>${t("historyH")}</h3>
     <div class="seg" id="metric" role="group"></div></div>
@@ -649,19 +651,20 @@ function renderSwimmer(s) {
   drawM();
 }
 
-/* Year on x, one line per distance; each point is that year's field-weighted percentile (or mean pace). */
+/* Year on x, one line per distance and suit (wetsuit dashed); each point is that year's field-weighted percentile (or mean pace). */
 function drawChart(s, groups) {
   const W = Math.max(320, $("#chart").clientWidth - 16), H = W < 640 ? 240 : 300, m = { l: 52, r: 18, t: 18, b: 30 };
-  const series = groups.map(([d, list]) => {
+  const series = groups.map(gr => {
+    const { d, wet, list } = gr;
     const yrs = new Map();
     for (const x of list) { if (x.time == null) continue; if (!yrs.has(x.r.year)) yrs.set(x.r.year, []); yrs.get(x.r.year).push(x); }
     const pts = [...yrs].map(([y, l]) => {
-      const v = metric === "pct" ? score(l)?.raw : l.reduce((a, x) => a + paceOf(x), 0) / l.length;
+      const v = metric === "pct" ? score(l)?.avg : l.reduce((a, x) => a + paceOf(x), 0) / l.length;
       return { y, v, l };
     }).filter(p => p.v != null).sort((a, b) => a.y - b.y);
-    return { d, pts };
+    return { d, wet, lab: groupLab(gr), pts };
   }).filter(se => se.pts.length);
-  $("#legend").innerHTML = series.map(se => `<span><i style="--c:${dcol(se.d)}"></i>${t("km", se.d)}</span>`).join("");
+  $("#legend").innerHTML = series.map(se => `<span><i class="${se.wet ? "dash" : ""}" style="--c:${dcol(se.d)}"></i>${esc(se.lab)}</span>`).join("");
   const box = $("#chart");
   if (!series.length) { box.innerHTML = `<div class="empty">–</div>`; return; }
   const ys = series.flatMap(se => se.pts.map(p => p.y)), vs = series.flatMap(se => se.pts.map(p => p.v));
@@ -677,14 +680,14 @@ function drawChart(s, groups) {
   const step = Math.max(1, Math.ceil((y1 - y0) / 10));
   for (let y = Math.ceil(y0); y <= y1; y += step) g += `<text class="ax" x="${X(y)}" y="${H - 8}" text-anchor="middle">${y}</text>`;
   g += `<text class="ax" x="${m.l}" y="${m.t - 2}" style="font-size:11px">${metric === "pct" ? t("pctAxis") : t("paceAxis")}</text>`;
-  const lines = series.map(se => `<path d="${se.pts.map((p, k) => (k ? "L" : "M") + X(p.y) + " " + Y(p.v)).join("")}" fill="none" stroke="${dcol(se.d)}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`
-    + se.pts.map(p => `<circle cx="${X(p.y)}" cy="${Y(p.v)}" r="4.5" fill="${dcol(se.d)}" stroke="var(--surface)" stroke-width="2"/>`).join("")).join("");
-  const hits = series.flatMap((se, si) => se.pts.map((p, pi) => `<circle data-si="${si}" data-pi="${pi}" cx="${X(p.y)}" cy="${Y(p.v)}" r="14" fill="transparent" tabindex="0" aria-label="${t("km", se.d)} ${p.y}"/>`)).join("");
+  const lines = series.map(se => `<path d="${se.pts.map((p, k) => (k ? "L" : "M") + X(p.y) + " " + Y(p.v)).join("")}" fill="none" stroke="${dcol(se.d)}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"${se.wet ? ' stroke-dasharray="6 4"' : ""}/>`
+    + se.pts.map(p => `<circle cx="${X(p.y)}" cy="${Y(p.v)}" r="4.5" fill="${se.wet ? "var(--surface)" : dcol(se.d)}" stroke="${se.wet ? dcol(se.d) : "var(--surface)"}" stroke-width="2"/>`).join("")).join("");
+  const hits = series.flatMap((se, si) => se.pts.map((p, pi) => `<circle data-si="${si}" data-pi="${pi}" cx="${X(p.y)}" cy="${Y(p.v)}" r="14" fill="transparent" tabindex="0" aria-label="${esc(se.lab)} ${p.y}"/>`)).join("");
   box.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${t("historyH")}">${g}${lines}${hits}</svg>`;
   const tip = $("#tip");
   const show = (el, ev) => {
     const se = series[+el.dataset.si], p = se.pts[+el.dataset.pi];
-    tip.innerHTML = `<b>${t("km", se.d)} · ${p.y}</b>${metric === "pct" ? t("top", pctTxt(p.v)) : fmtP(p.v) + " /100 m"}
+    tip.innerHTML = `<b>${esc(se.lab)} · ${p.y}</b>${metric === "pct" ? t("top", pctTxt(p.v)) : fmtP(p.v) + " /100 m"}
       <div class="sub">${p.l.map(x => `${esc(x.r.brand)} ${esc(x.r.stage)}: ${metric === "pct" ? t("top", pctTxt(x.pctA)) : fmtP(paceOf(x))}`).join("<br>")}</div>`;
     tip.style.display = "block";
     const r = el.getBoundingClientRect();
