@@ -651,24 +651,21 @@ function renderSwimmer(s) {
   drawM();
 }
 
-/* Year on x, one line per distance and suit (wetsuit dashed); each point is that year's field-weighted percentile (or mean pace). */
+/* Date on x, one line per distance and suit (wetsuit dashed); each race is its own point (age-group percentile or pace). */
+const yearFrac = r => { if (!r.date) return r.year + .5; const d = new Date(r.date + "T12:00"), a = new Date(r.year, 0, 1), b = new Date(r.year + 1, 0, 1); return r.year + (d - a) / (b - a); };
 function drawChart(s, groups) {
   const W = Math.max(320, $("#chart").clientWidth - 16), H = W < 640 ? 240 : 300, m = { l: 52, r: 18, t: 18, b: 30 };
   const series = groups.map(gr => {
     const { d, wet, list } = gr;
-    const yrs = new Map();
-    for (const x of list) { if (x.time == null) continue; if (!yrs.has(x.r.year)) yrs.set(x.r.year, []); yrs.get(x.r.year).push(x); }
-    const pts = [...yrs].map(([y, l]) => {
-      const v = metric === "pct" ? score(l)?.avg : l.reduce((a, x) => a + paceOf(x), 0) / l.length;
-      return { y, v, l };
-    }).filter(p => p.v != null).sort((a, b) => a.y - b.y);
+    const pts = list.filter(x => x.time != null).map(x => ({ y: yearFrac(x.r), v: metric === "pct" ? x.pctA ?? x.pctS : paceOf(x), x }))
+      .filter(p => p.v != null).sort((a, b) => a.y - b.y);
     return { d, wet, lab: groupLab(gr), pts };
   }).filter(se => se.pts.length);
   $("#legend").innerHTML = series.map(se => `<span><i class="${se.wet ? "dash" : ""}" style="--c:${dcol(se.d)}"></i>${esc(se.lab)}</span>`).join("");
   const box = $("#chart");
   if (!series.length) { box.innerHTML = `<div class="empty">–</div>`; return; }
   const ys = series.flatMap(se => se.pts.map(p => p.y)), vs = series.flatMap(se => se.pts.map(p => p.v));
-  let y0 = Math.min(...ys), y1 = Math.max(...ys); if (y0 === y1) { y0 -= 1; y1 += 1; }
+  const y0 = Math.floor(Math.min(...ys)), y1 = Math.floor(Math.max(...ys)) + 1; // whole calendar years
   let v0, v1;
   if (metric === "pct") { v0 = 0; v1 = Math.min(100, Math.ceil(Math.max(...vs) / 10) * 10 || 10); }
   else { v0 = Math.floor(Math.min(...vs) / 10) * 10; v1 = Math.ceil(Math.max(...vs) / 10) * 10; if (v1 - v0 < 20) v1 = v0 + 20; }
@@ -677,18 +674,20 @@ function drawChart(s, groups) {
   const tick = metric === "pct" ? 10 * Math.max(1, Math.round((v1 - v0) / 50)) : (v1 - v0 > 80 ? 20 : 10);
   let g = "";
   for (let v = v0; v <= v1 + .01; v += tick) g += `<line class="gl" x1="${m.l}" x2="${W - m.r}" y1="${Y(v)}" y2="${Y(v)}"/><text class="ax" x="${m.l - 8}" y="${Y(v) + 4}" text-anchor="end">${metric === "pct" ? (lang === "tr" ? "%" + v : v + "%") : fmtP(v)}</text>`;
-  const step = Math.max(1, Math.ceil((y1 - y0) / 10));
-  for (let y = Math.ceil(y0); y <= y1; y += step) g += `<text class="ax" x="${X(y)}" y="${H - 8}" text-anchor="middle">${y}</text>`;
+  const step = Math.max(1, Math.ceil((y1 - y0) / (W < 640 ? 6 : 10)));
+  for (let y = y0 + 1; y < y1; y++) g += `<line class="gl" x1="${X(y)}" x2="${X(y)}" y1="${m.t}" y2="${H - m.b}" style="opacity:.5"/>`;
+  for (let y = y0; y < y1; y += step) g += `<text class="ax" x="${X(y + .5)}" y="${H - 8}" text-anchor="middle">${y}</text>`;
   g += `<text class="ax" x="${m.l}" y="${m.t - 2}" style="font-size:11px">${metric === "pct" ? t("pctAxis") : t("paceAxis")}</text>`;
   const lines = series.map(se => `<path d="${se.pts.map((p, k) => (k ? "L" : "M") + X(p.y) + " " + Y(p.v)).join("")}" fill="none" stroke="${dcol(se.d)}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"${se.wet ? ' stroke-dasharray="6 4"' : ""}/>`
     + se.pts.map(p => `<circle cx="${X(p.y)}" cy="${Y(p.v)}" r="4.5" fill="${se.wet ? "var(--surface)" : dcol(se.d)}" stroke="${se.wet ? dcol(se.d) : "var(--surface)"}" stroke-width="2"/>`).join("")).join("");
-  const hits = series.flatMap((se, si) => se.pts.map((p, pi) => `<circle data-si="${si}" data-pi="${pi}" cx="${X(p.y)}" cy="${Y(p.v)}" r="14" fill="transparent" tabindex="0" aria-label="${esc(se.lab)} ${p.y}"/>`)).join("");
+  const hits = series.flatMap((se, si) => se.pts.map((p, pi) => `<circle data-si="${si}" data-pi="${pi}" cx="${X(p.y)}" cy="${Y(p.v)}" r="14" fill="transparent" tabindex="0" aria-label="${esc(se.lab)} ${esc(p.x.r.brand)} ${dateTxt(p.x.r)}"/>`)).join("");
   box.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${t("historyH")}">${g}${lines}${hits}</svg>`;
   const tip = $("#tip");
   const show = (el, ev) => {
     const se = series[+el.dataset.si], p = se.pts[+el.dataset.pi];
-    tip.innerHTML = `<b>${esc(se.lab)} · ${p.y}</b>${metric === "pct" ? t("top", pctTxt(p.v)) : fmtP(p.v) + " /100 m"}
-      <div class="sub">${p.l.map(x => `${esc(x.r.brand)} ${esc(x.r.stage)}: ${metric === "pct" ? t("top", pctTxt(x.pctA)) : fmtP(paceOf(x))}`).join("<br>")}</div>`;
+    const x = p.x;
+    tip.innerHTML = `<b>${esc(x.r.brand)}${x.r.stage ? " " + esc(x.r.stage) : ""} · ${dateTxt(x.r)}</b>${esc(se.lab)}<br>${metric === "pct" ? `${t("top", pctTxt(p.v))} <span class="sub">${x.pa ? x.pa + "/" + x.na : x.ps + "/" + x.ns}</span>` : fmtP(p.v) + " /100 m"}
+      <div class="sub">${metric === "pct" ? fmtP(paceOf(x)) + " /100 m · " + fmtT(x.time) : (x.pctA ?? x.pctS) != null ? t("top", pctTxt(x.pctA ?? x.pctS)) + " · " + fmtT(x.time) : fmtT(x.time)}</div>`;
     tip.style.display = "block";
     const r = el.getBoundingClientRect();
     tip.style.left = Math.min(window.scrollX + r.left + 16, window.scrollX + document.documentElement.clientWidth - tip.offsetWidth - 8) + "px";
