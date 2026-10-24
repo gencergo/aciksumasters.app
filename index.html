@@ -88,6 +88,7 @@ nav.links button:hover, .lang button:hover { color: var(--ink) }
 #filterBar.locked select { cursor: default }
 .lockmsg { display: none; font-size: 12px; color: var(--ink-3); margin: 2px 0 6px }
 #filterBar.locked .lockmsg { display: block }
+.bar .mode { flex-wrap: nowrap; flex-shrink: 0 }
 .bar .mode button { white-space: nowrap; font-size: 14px; padding: 6px 11px; min-height: 36px }
 .fsum, .sheethead, .sheetbg, .brand .ts { display: none }
 footer summary { cursor: pointer; font-weight: 600; color: var(--sea); padding: 6px 0 }
@@ -209,6 +210,36 @@ a.clink { color: inherit; text-decoration: underline; text-decoration-color: var
 .two .panel { margin: 0 }
 a.clink:hover { text-decoration-color: currentColor }
 
+/* sources: race × year coverage table */
+.cov { width: auto; border-collapse: separate; border-spacing: 3px; font-variant-numeric: tabular-nums }
+.cov th, .cov td { padding: 0; border: 0 }
+.cov thead th { text-align: center; font: 500 12px var(--mono); letter-spacing: 0; color: var(--ink-3); height: 28px; min-width: 44px }
+.cov th.ev { position: sticky; left: 0; z-index: 1; background: var(--surface); text-align: left; text-transform: none; letter-spacing: 0;
+  font: 600 14px var(--body); color: var(--ink); padding: 0 14px 0 6px; white-space: nowrap; min-width: 180px }
+.cov th.ev { box-shadow: 3px 0 0 var(--surface), -3px 0 0 var(--surface) }
+.cov tr.grp th { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--ink-3); text-align: left; padding: 12px 0 2px }
+.cov tr.grp th span { position: sticky; left: 6px }
+.cc { width: 44px; height: 34px; font-style: normal; border: 0; border-radius: 5px; display: grid; place-items: center; cursor: default; padding: 0;
+  font-weight: 700; font-size: 15px; background: transparent; color: var(--ink-3) }
+.cc.ok { --k: #1f8a55; background: color-mix(in srgb, var(--k) 22%, transparent); color: var(--k); cursor: pointer }
+.cc.part { --k: #b57a00; background: color-mix(in srgb, var(--k) 20%, transparent); color: var(--k); cursor: pointer }
+.cc.miss { --k: #c8452c; box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--k) 70%, transparent); color: var(--k); cursor: pointer }
+.cc.none { background: var(--grid); color: var(--ink-3); cursor: pointer }
+.cc.blank { box-shadow: inset 0 0 0 1px var(--grid) }
+.cc.part::before { content: ""; width: 11px; height: 11px; border-radius: 50%; border: 2px solid currentColor; background: linear-gradient(90deg, currentColor 50%, transparent 50%) }
+.ccc.sel { outline: 2px solid var(--ink); outline-offset: 1px }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .cc.ok { --k: #4cc488 } :root:not([data-theme="light"]) .cc.part { --k: #e2a93b } :root:not([data-theme="light"]) .cc.miss { --k: #ee7a62 } }
+:root[data-theme="dark"] .cc.ok { --k: #4cc488 } :root[data-theme="dark"] .cc.part { --k: #e2a93b } :root[data-theme="dark"] .cc.miss { --k: #ee7a62 }
+.covkey { display: flex; flex-wrap: wrap; gap: 6px 16px; padding: 0 16px 8px; font-size: 13px; color: var(--ink-2) }
+.covkey span { display: inline-flex; align-items: center; gap: 6px }
+.covkey .cc { width: 24px; height: 20px; font-size: 12px; border-radius: 4px }
+.covinfo { margin: 4px 16px 14px; padding: 10px 12px; border-radius: 8px; background: var(--bg); min-height: 44px; font-size: 14px }
+.covinfo b { margin-right: 6px } .covinfo a { font-weight: 600; margin-left: 6px; cursor: pointer }
+.why { list-style: none; margin: 0; padding: 0 16px 14px; display: grid; gap: 10px }
+.why li { display: grid; grid-template-columns: 26px 1fr; gap: 8px; align-items: start; font-size: 14px }
+.why li .cc { width: 26px; height: 22px; font-size: 12px; border-radius: 4px }
+.why li div b { display: block } .why li div span { color: var(--ink-2) }
+
 footer { margin-top: 24px; color: var(--ink-2); font-size: 13px; max-width: 86ch; display: grid; gap: 6px }
 
 @media (max-width: 760px) {
@@ -236,7 +267,7 @@ footer { margin-top: 24px; color: var(--ink-2); font-size: 13px; max-width: 86ch
   .bar .mode button { padding: 5px 8px; font-size: 13px; min-height: 34px }
   /* bottom tab bar */
   nav.links { position: fixed; left: 0; right: 0; bottom: 0; z-index: 35; background: var(--surface); border-top: 1px solid var(--line);
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; padding: 4px 4px calc(4px + env(safe-area-inset-bottom, 0px)) }
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; padding: 4px 4px calc(4px + env(safe-area-inset-bottom, 0px)) }
   nav.links button { flex-direction: column; gap: 2px; font-size: 11.5px; padding: 6px 2px; min-height: 52px; justify-content: center }
   nav.links button svg { width: 20px; height: 20px }
   nav.links button[aria-current=page] { background: none; color: var(--sea) }
@@ -254,6 +285,8 @@ footer { margin-top: 24px; color: var(--ink-2); font-size: 13px; max-width: 86ch
   .fsheet #fDist { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line) }
   .fsheet #fDist button { border: 0; background: var(--surface); white-space: nowrap } .fsheet #fDist button[aria-pressed=true] { background: var(--sea) }
   .two { grid-template-columns: 1fr }
+  .cov th.ev { min-width: 0; max-width: 112px; white-space: normal; font-size: 13px; line-height: 1.2; padding: 0 8px 0 4px }
+  .cov thead th { min-width: 36px; font-size: 11px } .cov .cc { width: 36px; height: 32px; font-size: 13px }
   .picker { grid-template-columns: 1fr; gap: 10px }
   .plist { flex-direction: row; overflow-x: auto; gap: 6px; padding: 8px }
   .plist button { flex: none; border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; min-height: 38px }
@@ -281,6 +314,7 @@ footer { margin-top: 24px; color: var(--ink-2); font-size: 13px; max-width: 86ch
       <button type="button" data-nav="rank"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 14V9h3v5M6.5 14V4h3v10M11 14V7h3v7" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><span class="lbl" data-t="navRank"></span></button>
       <button type="button" data-nav="races"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="3" width="12" height="11" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M2 6.5h12M5 1.5v3M11 1.5v3" stroke="currentColor" stroke-width="1.5"/></svg><span class="lbl" data-t="navRaces"></span></button>
       <button type="button" data-nav="clubs"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="10" r="4.2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M5 1.5 8 5.6 11 1.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg><span class="lbl" data-t="navClubs"></span></button>
+      <button type="button" data-nav="sources"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="2" width="12" height="12" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M2 6h12M2 10h12M6 2v12" stroke="currentColor" stroke-width="1.5"/></svg><span class="lbl" data-t="navSrc"></span></button>
     </nav>
     <div class="seg mode" id="fMode" role="group"></div>
     <div class="lang" role="group" aria-label="Language"><button type="button" data-lang="tr">TR</button><button type="button" data-lang="en">EN</button><button type="button" data-lang="ru">RU</button></div>
@@ -322,6 +356,13 @@ const store = { get(k, d) { try { const v = localStorage.getItem("tow:" + k); re
 const T = {
   tr: {
     title: "Türkiye Açık Su Masters Yüzücü Veritabanı", titleShort: "Açık Su Masters", method: "Yöntem ve kaynaklar", tagline: "Yaş grubu sıralamaları, yüzücü istatistikleri ve karşılaştırma",
+    navSrc: "Kaynaklar", srcH: "Hangi yarışın hangi yılı sitede?", srcHint: "Her satır bir yarış, her sütun bir yıl. ✓ olan yılların sonuçları sitede. Bir hücrenin üzerine gelin (telefonda dokunun), ayrıntısı tablonun altında çıkar.",
+    stOk: "Sitede", stPart: "Kısmen sitede", stMiss: "Sonuç yok", stNone: "Yapılmadı", stBlank: "Kayıt yok", covPick: "Bir hücre seçin.", covGo: "Sonuçlara git →",
+    covN: (n, s) => `${n.toLocaleString("tr-TR")} sonuç${s > 1 ? ` · ${s} etap` : ""}`, whyH: "Neden eksik?", onlyDist: d => `Sitede yalnızca ${d}.`,
+    covFoot: "Durum 24 Ekim 2026 itibarıyla; yeni sonuç bulundukça güncellenir. Boş hücre: o yıl yarışın yapıldığına dair kayıt yok.",
+    rs: { notHeld: "Yarış yapılmadı (pandemi ya da iptal).", notPub: "Sonuç hiçbir yerde yayımlanmamış.", deleted: "Sonuç yayımlanmış ama sonradan silinmiş; arşivlerde de yok.",
+      menOnly: "Yalnızca erkekler listesi yayımlanmış; kadınların sonucu yok.", partDist: "Bazı mesafelerin sonucu yok.", pending: "Sonuç bulundu, yakında eklenecek.",
+      notSearched: "Organizatörün arşivi daha sonra başlıyor; bu yıl henüz aranmadı.", noDist: "Sonuç dosyasında mesafe yazmıyor.", nonStd: "Yalnızca standart dışı mesafeler yüzüldü (2,5 / 12 / 25 km)." },
     navRank: "Sıralama", navCompare: "Karşılaştır", navRaces: "Yarışlar", searchPh: "Yüzücü ara…",
     open: "Açık su", canal: "Boğaz geçişleri", sex: "Cinsiyet", F: "Kadın", M: "Erkek", ageGroup: "Yaş grubu", distance: "Mesafe",
     suit: "Kıyafet", skin: "Mayo", wet: "Neopren", years: "Yıllar", allYears: "Tümü", last3: "Son 3 yıl", lastN: n => `Son ${n} yıl`, show: "Göster",
@@ -354,6 +395,13 @@ const T = {
   },
   en: {
     title: "Turkish Open Water Masters Swimmers Database", titleShort: "Open Water Masters", method: "Method and sources", tagline: "Age-group rankings, swimmer stats and head-to-head",
+    navSrc: "Sources", srcH: "Which race years are on the site?", srcHint: "One row per race, one column per year. Years marked ✓ have their results on the site. Hover over a cell (tap on a phone) to see the details below the table.",
+    stOk: "On the site", stPart: "Partly on the site", stMiss: "No results", stNone: "Not held", stBlank: "No record", covPick: "Pick a cell.", covGo: "Go to results →",
+    covN: (n, s) => `${n.toLocaleString("en-GB")} results${s > 1 ? ` · ${s} legs` : ""}`, whyH: "Why is it missing?", onlyDist: d => `Only ${d} is on the site.`,
+    covFoot: "Status as of 24 October 2026; updated as new results turn up. Empty cell: no record that the race took place that year.",
+    rs: { notHeld: "Not held (pandemic or cancelled).", notPub: "Results were never published anywhere.", deleted: "Results were published but later taken down, and no archive kept them.",
+      menOnly: "Only the men's list was published; no women's results.", partDist: "Some distances have no results.", pending: "Results found; they will be added soon.",
+      notSearched: "The organiser's archive starts later; this year has not been searched yet.", noDist: "The result file does not say the distance.", nonStd: "Only non-standard distances were swum (2.5 / 12 / 25 km)." },
     navRank: "Rankings", navCompare: "Compare", navRaces: "Races", searchPh: "Search swimmers…",
     open: "Open water", canal: "Strait crossings", sex: "Sex", F: "Women", M: "Men", ageGroup: "Age group", distance: "Distance",
     suit: "Suit", skin: "Swimsuit", wet: "Wetsuit", years: "Years", allYears: "All", last3: "Last 3 years", lastN: n => n === 1 ? "Last year" : `Last ${n} years`, show: "Show",
@@ -386,6 +434,13 @@ const T = {
   },
   ru: {
     title: "База пловцов-мастерс Турции", titleShort: "Пловцы-мастерс", method: "Методика и источники", tagline: "Рейтинги по возрастным группам, статистика пловцов",
+    navSrc: "Источники", srcH: "Какие годы каждого заплыва есть на сайте?", srcHint: "Строка — заплыв, столбец — год. Годы с ✓ есть на сайте. Наведите на ячейку (на телефоне — нажмите), подробности появятся под таблицей.",
+    stOk: "На сайте", stPart: "Частично", stMiss: "Нет результатов", stNone: "Не проводился", stBlank: "Нет данных", covPick: "Выберите ячейку.", covGo: "К результатам →",
+    covN: (n, s) => `${n.toLocaleString("ru-RU")} результатов${s > 1 ? ` · этапов: ${s}` : ""}`, whyH: "Почему нет данных?", onlyDist: d => `На сайте только ${d}.`,
+    covFoot: "Состояние на 24 октября 2026 года; обновляется по мере появления новых протоколов. Пустая ячейка: нет сведений, что заплыв проводился в этот год.",
+    rs: { notHeld: "Не проводился (пандемия или отмена).", notPub: "Протокол нигде не публиковался.", deleted: "Протокол публиковался, но позже был удалён и не сохранился в архивах.",
+      menOnly: "Опубликован только протокол мужчин; результатов женщин нет.", partDist: "По некоторым дистанциям результатов нет.", pending: "Протокол найден, скоро будет добавлен.",
+      notSearched: "Архив организатора начинается позже; этот год ещё не искали.", noDist: "В протоколе не указана дистанция.", nonStd: "Проводились только нестандартные дистанции (2,5 / 12 / 25 км)." },
     navRank: "Рейтинг", navCompare: "Сравнение", navRaces: "Заплывы", searchPh: "Поиск пловца…",
     open: "Открытая вода", canal: "Проливы", sex: "Пол", F: "Женщины", M: "Мужчины", ageGroup: "Возрастная группа", distance: "Дистанция",
     suit: "Костюм", skin: "Без гидрокостюма", wet: "В гидрокостюме", years: "Годы", allYears: "Все", last3: "Последние 3 года", lastN: n => n === 1 ? "Последний год" : `Последние ${n} года`, show: "Показать",
@@ -909,6 +964,81 @@ function renderClub(cl) {
   document.querySelectorAll("tr.go[data-r]").forEach(tr => { const o = () => go(`#/r/${tr.dataset.r}`); tr.onclick = o; tr.onkeydown = e => { if (e.key === "Enter") o(); }; });
 }
 
+/* ---------- sources: which race years are on the site ----------
+   Cells with races in data.json are "ok"; COV adds why a year is missing or partial (sources/missing-evidence.md).
+   A reason in PART marks a year whose races are only partly here; without any race that year it counts as missing. */
+const COV = [
+  ["AquaChallenge", 0, { 2020: "notHeld" }],
+  ["Sporfest", 0, { 2019: "notPub", 2020: "notHeld", 2021: "notPub", 2022: "notPub", 2023: "notPub", 2024: ["partDist", 3000] }],
+  ["X-Waters", 0, {}],
+  ["Oceanman", 0, { 2019: "pending", 2020: "notHeld", 2021: ["partDist", 10000] }],
+  ["Çeşme", 0, { 2015: "noDist", 2016: "noDist", 2019: ["partDist", 1500] }],
+  ["Boğaziçi Olimpik", 0, { 2020: "notHeld", 2026: "nonStd" }],
+  ["Datça Kış Maratonu", 0, { 2013: "notSearched", 2014: "notSearched", 2015: "notSearched", 2017: "notPub", 2018: "notPub", 2021: "notPub", 2023: "pending" }],
+  ["Boğaziçi Kıtalararası", 1, { 2013: "notSearched" }],
+  ["Çanakkale Boğazı", 1, { 2020: "notHeld", 2022: "deleted", 2023: "menOnly" }],
+  ["Meis–Kaş", 1, { 2013: "notSearched", 2014: "notSearched", 2016: "deleted", 2017: "deleted", 2020: "notHeld", 2021: "notHeld", 2022: "deleted", 2025: "notPub", 2026: "notPub" }],
+];
+const PART = ["partDist", "menOnly"];
+const COVY = Array.from({ length: MAXY - 2013 + 1 }, (_, i) => 2013 + i);
+const covMark = { ok: "✓", part: "", miss: "✕", none: "–", blank: "" };
+function covCell(b, y, x) {
+  const rs = RACES.filter(r => r.brand === b && r.year === y);
+  const [why, d] = Array.isArray(x[y]) ? x[y] : [x[y]];
+  const st = why ? (PART.includes(why) ? (rs.length ? "part" : "miss") : why === "notHeld" ? "none" : rs.length ? "ok" : "miss") : rs.length ? "ok" : "blank";
+  const n = rs.reduce((a, r) => a + (FIN.get(r.i) || 0), 0), legs = new Set(rs.map(r => r.stage)).size;
+  return { b, y, st, why, d, n, legs, has: rs.length > 0 };
+}
+function sourcesHTML() {
+  const rows = COV.filter(([, canal]) => F.mode === "all" || canal === (F.mode === "canal" ? 1 : 0));
+  const cells = rows.map(([b, , x]) => COVY.map(y => covCell(b, y, x)));
+  const key = ["ok", "part", "miss", "none"].map(k => `<span><i class="cc ${k}">${covMark[k]}</i>${t("st" + k[0].toUpperCase() + k.slice(1))}</span>`).join("");
+  let grp = null, body = "";
+  rows.forEach(([b, canal], ri) => {
+    if (canal !== grp) { grp = canal; body += `<tr class="grp"><th colspan="${COVY.length + 1}"><span>${t(canal ? "canal" : "open")}</span></th></tr>`; }
+    body += `<tr><th class="ev" scope="row">${esc(b)}</th>${cells[ri].map((c, yi) => `<td><button type="button" class="cc ${c.st}" data-ri="${ri}" data-yi="${yi}"
+      aria-label="${esc(b)} ${c.y}: ${t("st" + c.st[0].toUpperCase() + c.st.slice(1))}">${covMark[c.st]}</button></td>`).join("")}</tr>`;
+  });
+  // reasons, each with the race years it applies to
+  const why = new Map();
+  cells.flat().filter(c => c.why && c.st !== "ok").forEach(c => { if (!why.has(c.why)) why.set(c.why, { st: c.st, list: new Map() });
+    const l = why.get(c.why).list; if (!l.has(c.b)) l.set(c.b, []); l.get(c.b).push(c.y); });
+  const order = ["pending", "menOnly", "partDist", "notPub", "deleted", "notSearched", "noDist", "nonStd", "notHeld"];
+  const whyList = [...why].sort((a, b) => order.indexOf(a[0]) - order.indexOf(b[0])).map(([k, v]) =>
+    `<li><i class="cc ${v.st}">${covMark[v.st]}</i><div><b>${t("rs")[k]}</b><span>${[...v.list].map(([b, ys]) => `${esc(b)} ${ys.join(", ")}`).join(" · ")}</span></div></li>`).join("");
+  return { cells, html: `<div class="panel"><div class="phead"><h2>${t("srcH")}</h2></div>
+    <p class="hint" style="padding:0 16px;margin-bottom:8px">${t("srcHint")}</p>
+    <div class="covkey">${key}</div>
+    <div class="tablewrap" style="margin:0 10px"><table class="cov"><thead><tr><th class="ev"></th>${COVY.map(y => `<th scope="col">${y}</th>`).join("")}</tr></thead><tbody>${body}</tbody></table></div>
+    <div class="covinfo" id="covInfo">${t("covPick")}</div></div>
+    <div class="panel"><div class="phead"><h3>${t("whyH")}</h3></div><ul class="why">${whyList}</ul>
+    <p class="sub" style="padding:0 16px 14px;margin:0">${t("covFoot")}</p></div>` };
+}
+function bindSources(root, cells) {
+  const info = root.querySelector("#covInfo"), hover = matchMedia("(hover: hover)").matches;
+  const open = c => { RV.by = "event"; RV.brand = c.b; RV.year = c.y; store.set("racesV", RV); go("#/races"); };
+  const show = el => {
+    const c = cells[+el.dataset.ri][+el.dataset.yi];
+    root.querySelectorAll(".cov .cc.sel").forEach(e => e.classList.remove("sel")); el.classList.add("sel");
+    const st = t("st" + c.st[0].toUpperCase() + c.st.slice(1));
+    const why = c.why ? (c.why === "partDist" && c.d ? t("onlyDist", t("km", c.d)) + " " : "") + t("rs")[c.why] : "";
+    info.innerHTML = `<b>${esc(c.b)} ${c.y}</b>${st}${c.has ? " · " + t("covN", c.n, c.legs) : ""}${why ? `<div class="sub">${why}</div>` : ""}${c.has ? `<a id="covGo">${t("covGo")}</a>` : ""}`;
+    const a = info.querySelector("#covGo"); if (a) a.onclick = () => open(c);
+    return c;
+  };
+  root.querySelectorAll(".cov .cc").forEach(el => {
+    if (hover) el.onmouseenter = () => show(el);
+    el.onfocus = () => show(el);
+    el.onclick = () => { const c = show(el); if (hover && c.has) open(c); };
+  });
+}
+function renderSources() {
+  const { cells, html } = sourcesHTML();
+  $("#main").innerHTML = html;
+  bindSources($("#main"), cells);
+  const tw = $("#main .tablewrap"); tw.scrollLeft = tw.scrollWidth; // phones: start at the latest years
+}
+
 /* ---------- routing ---------- */
 function go(h) { if (location.hash === h) route(); else location.hash = h; }
 function route() {
@@ -917,6 +1047,7 @@ function route() {
   if (p[0] === "s" && SW[+p[1]] && !SW[+p[1]].unnamed) view = { name: "swimmer", s: SW[+p[1]] };
   else if (p[0] === "races") view = { name: "races" };
   else if (p[0] === "clubs") view = { name: "clubs" };
+  else if (p[0] === "sources") view = { name: "sources" };
   else if (p[0] === "k" && CLUBS[+p[1]]) { view = { name: "club", c: CLUBS[+p[1]] }; recentN = 30; }
   else if (p[0] === "r" && RACES[+p[1]]) view = { name: "race", r: RACES[+p[1]] };
   else view = { name: "rank" };
@@ -926,7 +1057,7 @@ function render(scroll) {
   document.documentElement.lang = lang;
   document.querySelectorAll("[data-t]").forEach(el => el.textContent = t(el.dataset.t));
   document.querySelectorAll(".lang button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
-  const nav = { rank: "rank", swimmer: "rank", races: "races", race: "races", clubs: "clubs", club: "clubs" }[view.name];
+  const nav = { rank: "rank", swimmer: "rank", races: "races", race: "races", clubs: "clubs", club: "clubs", sources: "sources" }[view.name];
   document.querySelectorAll("[data-nav]").forEach(b => b.dataset.nav === nav ? b.setAttribute("aria-current", "page") : b.removeAttribute("aria-current"));
   $("#filterBar").hidden = view.name !== "rank"; $("#fMode").hidden = view.name === "swimmer"; // swimmer page: no filters at all (g, 2026-10-17)
   if (scroll) sheet(false);
@@ -936,12 +1067,13 @@ function render(scroll) {
   else if (view.name === "races") renderRaces();
   else if (view.name === "clubs") renderClubs();
   else if (view.name === "club") renderClub(view.c);
+  else if (view.name === "sources") renderSources();
   else renderRace(view.r);
   $("#coverage").textContent = t("coverage", RACES.length.toLocaleString(), SW.length.toLocaleString());
   if (scroll) window.scrollTo({ top: view.name === "swimmer" ? Math.max(0, $("#main").offsetTop - 70) : 0 });
 }
 $("#home").onclick = () => go("#/");
-document.querySelectorAll("[data-nav]").forEach(b => b.onclick = () => go({ rank: "#/", races: "#/races", clubs: "#/clubs" }[b.dataset.nav]));
+document.querySelectorAll("[data-nav]").forEach(b => b.onclick = () => go({ rank: "#/", races: "#/races", clubs: "#/clubs", sources: "#/sources" }[b.dataset.nav]));
 document.querySelectorAll("[data-lang]").forEach(b => b.onclick = () => { lang = b.dataset.lang; store.set("lang", lang); mountSearch(); render(); });
 function mountSearch() { searchBox($("#topSearch"), s => go(`#/s/${s.i}`)); }
 mountSearch();
