@@ -359,7 +359,7 @@ const T = {
     navSrc: "Kaynaklar", srcH: "Hangi yarışın hangi yılı sitede?", srcHint: "Her satır bir yarış, her sütun bir yıl. ✓ olan yılların sonuçları sitede. Bir hücrenin üzerine gelin (telefonda dokunun), ayrıntısı tablonun altında çıkar.",
     stOk: "Sitede", stPart: "Kısmen sitede", stMiss: "Sonuç yok", stNone: "Yapılmadı", stBlank: "Kayıt yok", covPick: "Bir hücre seçin.", covGo: "Sonuçlara git →",
     covN: (n, s) => `${n.toLocaleString("tr-TR")} sonuç${s > 1 ? ` · ${s} etap` : ""}`, whyH: "Neden eksik?", onlyDist: d => `Sitede yalnızca ${d}.`,
-    covFoot: "Durum 24 Ekim 2026 itibarıyla; yeni sonuç bulundukça güncellenir. Boş hücre: o yıl yarışın yapıldığına dair kayıt yok.",
+    covFoot: "Durum 28 Ekim 2026 itibarıyla; yeni sonuç bulundukça güncellenir. Boş hücre: o yıl yarışın yapıldığına dair kayıt yok.",
     rs: { notHeld: "Yarış yapılmadı (pandemi ya da iptal).", notPub: "Sonuç hiçbir yerde yayımlanmamış.", deleted: "Sonuç yayımlanmış ama sonradan silinmiş; arşivlerde de yok.",
       menOnly: "Yalnızca erkekler listesi yayımlanmış; kadınların sonucu yok.", partDist: "Bazı mesafelerin sonucu yok.", pending: "Sonuç bulundu, yakında eklenecek.",
       notSearched: "Organizatörün arşivi daha sonra başlıyor; bu yıl henüz aranmadı.", noDist: "Sonuç dosyasında mesafe yazmıyor.", nonStd: "Yalnızca standart dışı mesafeler yüzüldü (2,5 / 12 / 25 km)." },
@@ -398,7 +398,7 @@ const T = {
     navSrc: "Sources", srcH: "Which race years are on the site?", srcHint: "One row per race, one column per year. Years marked ✓ have their results on the site. Hover over a cell (tap on a phone) to see the details below the table.",
     stOk: "On the site", stPart: "Partly on the site", stMiss: "No results", stNone: "Not held", stBlank: "No record", covPick: "Pick a cell.", covGo: "Go to results →",
     covN: (n, s) => `${n.toLocaleString("en-GB")} results${s > 1 ? ` · ${s} legs` : ""}`, whyH: "Why is it missing?", onlyDist: d => `Only ${d} is on the site.`,
-    covFoot: "Status as of 24 October 2026; updated as new results turn up. Empty cell: no record that the race took place that year.",
+    covFoot: "Status as of 28 October 2026; updated as new results turn up. Empty cell: no record that the race took place that year.",
     rs: { notHeld: "Not held (pandemic or cancelled).", notPub: "Results were never published anywhere.", deleted: "Results were published but later taken down, and no archive kept them.",
       menOnly: "Only the men's list was published; no women's results.", partDist: "Some distances have no results.", pending: "Results found; they will be added soon.",
       notSearched: "The organiser's archive starts later; this year has not been searched yet.", noDist: "The result file does not say the distance.", nonStd: "Only non-standard distances were swum (2.5 / 12 / 25 km)." },
@@ -437,7 +437,7 @@ const T = {
     navSrc: "Источники", srcH: "Какие годы каждого заплыва есть на сайте?", srcHint: "Строка — заплыв, столбец — год. Годы с ✓ есть на сайте. Наведите на ячейку (на телефоне — нажмите), подробности появятся под таблицей.",
     stOk: "На сайте", stPart: "Частично", stMiss: "Нет результатов", stNone: "Не проводился", stBlank: "Нет данных", covPick: "Выберите ячейку.", covGo: "К результатам →",
     covN: (n, s) => `${n.toLocaleString("ru-RU")} результатов${s > 1 ? ` · этапов: ${s}` : ""}`, whyH: "Почему нет данных?", onlyDist: d => `На сайте только ${d}.`,
-    covFoot: "Состояние на 24 октября 2026 года; обновляется по мере появления новых протоколов. Пустая ячейка: нет сведений, что заплыв проводился в этот год.",
+    covFoot: "Состояние на 28 октября 2026 года; обновляется по мере появления новых протоколов. Пустая ячейка: нет сведений, что заплыв проводился в этот год.",
     rs: { notHeld: "Не проводился (пандемия или отмена).", notPub: "Протокол нигде не публиковался.", deleted: "Протокол публиковался, но позже был удалён и не сохранился в архивах.",
       menOnly: "Опубликован только протокол мужчин; результатов женщин нет.", partDist: "По некоторым дистанциям результатов нет.", pending: "Протокол найден, скоро будет добавлен.",
       notSearched: "Архив организатора начинается позже; этот год ещё не искали.", noDist: "В протоколе не указана дистанция.", nonStd: "Проводились только нестандартные дистанции (2,5 / 12 / 25 км)." },
@@ -970,16 +970,21 @@ const COV = [
   ["AquaChallenge", 0, { 2020: "notHeld" }],
   ["Sporfest", 0, { 2019: "notPub", 2020: "notHeld", 2021: "notPub", 2022: "notPub", 2023: "notPub", 2024: ["partDist", 3000] }],
   ["X-Waters", 0, {}],
-  ["Oceanman", 0, { 2019: "pending", 2020: "notHeld", 2021: ["partDist", 10000] }],
+  ["Oceanman", 0, { 2020: "notHeld" }],
   ["Çeşme", 0, { 2015: "noDist", 2016: "noDist", 2019: ["partDist", 1500] }],
+  ["Dalyan", 0, { 2016: "noDist", 2017: "noDist", 2018: "noDist" }],
+  ["Karadeniz Ereğli", 0, {}],
   ["Boğaziçi Olimpik", 0, { 2020: "notHeld", 2026: "nonStd" }],
-  ["Datça Kış Maratonu", 0, { 2013: "notSearched", 2014: "notSearched", 2015: "notSearched", 2017: "notPub", 2018: "notPub", 2021: "notPub", 2023: "pending" }],
-  ["Boğaziçi Kıtalararası", 1, { 2013: "notSearched" }],
-  ["Çanakkale Boğazı", 1, { 2020: "notHeld", 2022: "deleted", 2023: "menOnly" }],
-  ["Meis–Kaş", 1, { 2013: "notSearched", 2014: "notSearched", 2016: "deleted", 2017: "deleted", 2020: "notHeld", 2021: "notHeld", 2022: "deleted", 2025: "notPub", 2026: "notPub" }],
+  ["Datça Kış Maratonu", 0, { 2009: "notSearched", 2010: "notSearched", 2011: "notSearched", 2012: "notSearched", 2013: "notSearched", 2014: "notSearched", 2015: "notSearched",
+    2018: ["partDist", 1500], 2021: "notPub", 2023: "notPub" }],
+  ["Boğaziçi Kıtalararası", 1, {}],
+  ["Çanakkale Boğazı", 1, { 2020: "notHeld", 2022: "deleted" }],
+  ["Meis–Kaş", 1, { 2009: "notSearched", 2010: "notSearched", 2011: "notSearched", 2012: "notSearched", 2013: "notSearched", 2014: "notSearched",
+    2016: "deleted", 2017: "deleted", 2020: "notHeld", 2021: "notHeld", 2022: "deleted", 2025: "notPub", 2026: "notPub" }],
 ];
 const PART = ["partDist", "menOnly"];
-const COVY = Array.from({ length: MAXY - 2013 + 1 }, (_, i) => 2013 + i);
+const COV0 = Math.min(...RACES.filter(r => COV.some(([b]) => b === r.brand)).map(r => r.year));
+const COVY = Array.from({ length: MAXY - COV0 + 1 }, (_, i) => COV0 + i);
 const covMark = { ok: "✓", part: "", miss: "✕", none: "–", blank: "" };
 function covCell(b, y, x) {
   const rs = RACES.filter(r => r.brand === b && r.year === y);
@@ -988,6 +993,9 @@ function covCell(b, y, x) {
   const n = rs.reduce((a, r) => a + (FIN.get(r.i) || 0), 0), legs = new Set(rs.map(r => r.stage)).size;
   return { b, y, st, why, d, n, legs, has: rs.length > 0 };
 }
+// [2009, 2010, 2011, 2014] -> "2009–2011, 2014"
+const yrRuns = ys => ys.reduce((a, y) => { const l = a[a.length - 1]; if (l && y === l[1] + 1) l[1] = y; else a.push([y, y]); return a; }, [])
+  .map(([a, b]) => a === b ? a : b === a + 1 ? `${a}, ${b}` : `${a}–${b}`).join(", ");
 function sourcesHTML() {
   const rows = COV.filter(([, canal]) => F.mode === "all" || canal === (F.mode === "canal" ? 1 : 0));
   const cells = rows.map(([b, , x]) => COVY.map(y => covCell(b, y, x)));
@@ -1004,7 +1012,7 @@ function sourcesHTML() {
     const l = why.get(c.why).list; if (!l.has(c.b)) l.set(c.b, []); l.get(c.b).push(c.y); });
   const order = ["pending", "menOnly", "partDist", "notPub", "deleted", "notSearched", "noDist", "nonStd", "notHeld"];
   const whyList = [...why].sort((a, b) => order.indexOf(a[0]) - order.indexOf(b[0])).map(([k, v]) =>
-    `<li><i class="cc ${v.st}">${covMark[v.st]}</i><div><b>${t("rs")[k]}</b><span>${[...v.list].map(([b, ys]) => `${esc(b)} ${ys.join(", ")}`).join(" · ")}</span></div></li>`).join("");
+    `<li><i class="cc ${v.st}">${covMark[v.st]}</i><div><b>${t("rs")[k]}</b><span>${[...v.list].map(([b, ys]) => `${esc(b)} ${yrRuns(ys)}`).join(" · ")}</span></div></li>`).join("");
   return { cells, html: `<div class="panel"><div class="phead"><h2>${t("srcH")}</h2></div>
     <p class="hint" style="padding:0 16px;margin-bottom:8px">${t("srcHint")}</p>
     <div class="covkey">${key}</div>
