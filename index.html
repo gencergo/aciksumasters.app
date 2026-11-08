@@ -264,6 +264,46 @@ footer { margin-top: 24px; color: var(--ink-2); font-size: 13px; max-width: 86ch
   td, th { padding: 7px 6px }
   th { white-space: normal }
 }
+/* swimmer profile (design B, g 2026-11-08): hero with 4 numbers, then career year by year */
+.pf-hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px 28px; padding: 18px; align-items: center }
+.pf-id { display: flex; gap: 16px; align-items: center; min-width: 0 }
+.pf-av { flex: none; width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; background: var(--sea); color: var(--sea-ink);
+  font-family: var(--display); font-weight: 700; font-size: 26px; letter-spacing: .02em }
+.pf-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px }
+.pf-yrs { display: flex; align-items: center; gap: 10px } .pf-yrs .seg button { min-height: 32px; padding: 4px 10px; font-size: 13px }
+.pf-kpis { display: grid; grid-template-columns: repeat(4, minmax(120px, auto)); border: 1px solid var(--line); border-radius: 9px }
+.kpi { padding: 10px 14px } .kpi + .kpi { border-left: 1px solid var(--line) }
+.kpi .k { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3) }
+.kpi .v { font-family: var(--display); font-size: 28px; font-weight: 600; line-height: 1.15; min-height: 32px; display: flex; align-items: center; font-variant-numeric: tabular-nums }
+.kpi .s { font-size: 12px; color: var(--ink-3) }
+.mc.big { gap: 12px; font-size: 24px } .mc.big i { width: 15px; height: 15px }
+.catl { font-size: 13.5px; font-weight: 600; text-decoration: none }
+.views { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-3); font-size: 13px }
+.yt td { padding: 8px 10px; border-bottom: 1px solid var(--grid); vertical-align: top }
+.yt tr:last-child td { border-bottom: 0 }
+.yt .yr { font-family: var(--display); font-size: 22px; font-weight: 700; line-height: 1.1 }
+.yt .clc { font-size: 13px; width: 190px } .yt .clc .clink { color: var(--ink-2) }
+.yt .so, .yt .sa, .yt .sp { white-space: nowrap; padding-top: 11px }
+.chips { display: flex; flex-wrap: wrap; gap: 5px }
+.chip { display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; padding: 3px 7px 3px 6px; border-radius: 6px; text-decoration: none; color: var(--ink);
+  border: 1.5px solid var(--c); background: color-mix(in srgb, var(--c) 12%, var(--surface)); white-space: nowrap; min-height: 26px }
+.chip:hover { background: color-mix(in srgb, var(--c) 24%, var(--surface)) }
+.chip.wet { border-style: dashed; background: var(--surface) } .chip.out { opacity: .6 }
+.chip b { color: var(--c); font-weight: 700 } .chip .medal { width: 16px; height: 16px; font-size: 9px; margin: 0 }
+.pop { padding: 10px 16px 14px; display: flex; flex-wrap: wrap; gap: 6px }
+.pop a { display: inline-flex; gap: 6px; align-items: center; border: 1px solid var(--line); border-radius: 999px; padding: 4px 11px; text-decoration: none; color: var(--ink); font-size: 14px }
+.pop a:hover { background: var(--sel) } .pop small { color: var(--ink-3); display: inline-flex; align-items: center; gap: 3px }
+@media (max-width: 760px) {
+  .pf-hero { grid-template-columns: 1fr; padding: 14px }
+  .pf-av { width: 48px; height: 48px; font-size: 20px }
+  .pf-right { align-items: stretch } .pf-yrs { justify-content: space-between }
+  .pf-kpis { grid-template-columns: 1fr 1fr } .kpi:nth-child(3) { border-left: 0 } .kpi:nth-child(n+3) { border-top: 1px solid var(--line) }
+  .yt thead { display: none }
+  .yt tr { display: grid; grid-template-columns: auto 1fr auto; grid-template-areas: "y c p" "x x x"; gap: 6px 10px; padding: 10px 12px; border-bottom: 1px solid var(--grid) }
+  .yt td { border: 0; padding: 0 } .yt .yr { grid-area: y } .yt .clc { grid-area: c; width: auto; align-self: center } .yt .chc { grid-area: x } .yt .sp { grid-area: p; padding-top: 0; align-self: center }
+  .yt .so, .yt .sa { display: none }
+  .pop { flex-wrap: nowrap; overflow-x: auto }
+}
 </style>
 </head>
 <body>
@@ -322,6 +362,10 @@ const store = { get(k, d) { try { const v = localStorage.getItem("tow:" + k); re
 const T = {
   tr: {
     title: "Türkiye Açık Su Masters Yüzücü Veritabanı", titleShort: "Açık Su Masters", method: "Yöntem ve kaynaklar", tagline: "Yaş grubu sıralamaları, yüzücü istatistikleri ve karşılaştırma",
+    inCatLine: (lab, k, n, p) => `${lab} sıralamasında ${k}. / ${n} (ilk %${p})`, lastAg: "Son yaş grubu", noRecent: "Son 3 yılda yarışı yok, tüm yıllar gösteriliyor.",
+    seasons: "sezon", kOverall: "Genel madalya", kOverallSub: "Kadın / Erkek ilk 3", kAg: "Yaş grubu madalya", kAgSub: "yaş grubunda ilk 3", kAvg: "Ortalama yüzdelik", kAvgSub: "yaş grubunda, ağırlıklı",
+    careerH: "Kariyer, yıl yıl", careerNote: "her kutu bir yarış · renk = mesafe · kesik kenar = neopren · sayı = yaş grubu sırası (yoksa genel)", thAg: "YG",
+    views: n => `${n} görüntülenme`, popularH: "En çok bakılan profiller", popularNote: "profil sayfası görüntülenmesi, kişi başı günde bir kez sayılır",
     navRank: "Sıralama", navCompare: "Karşılaştır", navRaces: "Yarışlar", searchPh: "Yüzücü ara…",
     open: "Açık su", canal: "Boğaz geçişleri", sex: "Cinsiyet", F: "Kadın", M: "Erkek", ageGroup: "Yaş grubu", distance: "Mesafe",
     suit: "Kıyafet", skin: "Mayo", wet: "Neopren", years: "Yıllar", allYears: "Tümü", last3: "Son 3 yıl", lastN: n => `Son ${n} yıl`, show: "Göster",
@@ -354,6 +398,10 @@ const T = {
   },
   en: {
     title: "Turkish Open Water Masters Swimmers Database", titleShort: "Open Water Masters", method: "Method and sources", tagline: "Age-group rankings, swimmer stats and head-to-head",
+    inCatLine: (lab, k, n, p) => `${lab} ranking: ${k} of ${n} (top ${p}%)`, lastAg: "Latest age group", noRecent: "No races in the last 3 years; showing all years.",
+    seasons: "seasons", kOverall: "Overall medals", kOverallSub: "top 3 women / men", kAg: "Age-group medals", kAgSub: "top 3 in age group", kAvg: "Average percentile", kAvgSub: "in age group, weighted",
+    careerH: "Career, year by year", careerNote: "each box is a race · colour = distance · dashed edge = wetsuit · number = age-group place (else overall)", thAg: "AG",
+    views: n => `${n} views`, popularH: "Most viewed profiles", popularNote: "profile page views, counted once per visitor per day",
     navRank: "Rankings", navCompare: "Compare", navRaces: "Races", searchPh: "Search swimmers…",
     open: "Open water", canal: "Strait crossings", sex: "Sex", F: "Women", M: "Men", ageGroup: "Age group", distance: "Distance",
     suit: "Suit", skin: "Swimsuit", wet: "Wetsuit", years: "Years", allYears: "All", last3: "Last 3 years", lastN: n => n === 1 ? "Last year" : `Last ${n} years`, show: "Show",
@@ -386,6 +434,10 @@ const T = {
   },
   ru: {
     title: "База пловцов-мастерс Турции", titleShort: "Пловцы-мастерс", method: "Методика и источники", tagline: "Рейтинги по возрастным группам, статистика пловцов",
+    inCatLine: (lab, k, n, p) => `Рейтинг ${lab}: ${k} из ${n} (топ ${p}%)`, lastAg: "Последняя возр. группа", noRecent: "За последние 3 года заплывов нет, показаны все годы.",
+    seasons: "сезонов", kOverall: "Медали (абсолют)", kOverallSub: "топ-3 среди женщин / мужчин", kAg: "Медали (возр. группа)", kAgSub: "топ-3 в возрастной группе", kAvg: "Средний процентиль", kAvgSub: "в возр. группе, взвешенный",
+    careerH: "Карьера по годам", careerNote: "каждый блок — заплыв · цвет = дистанция · пунктир = гидрокостюм · число = место в возр. группе (иначе в абсолюте)", thAg: "ВГ",
+    views: n => `${n} просмотров`, popularH: "Самые просматриваемые профили", popularNote: "просмотры страницы профиля, не чаще раза в день на посетителя",
     navRank: "Рейтинг", navCompare: "Сравнение", navRaces: "Заплывы", searchPh: "Поиск пловца…",
     open: "Открытая вода", canal: "Проливы", sex: "Пол", F: "Женщины", M: "Мужчины", ageGroup: "Возрастная группа", distance: "Дистанция",
     suit: "Костюм", skin: "Без гидрокостюма", wet: "В гидрокостюме", years: "Годы", allYears: "Все", last3: "Последние 3 года", lastN: n => n === 1 ? "Последний год" : `Последние ${n} года`, show: "Показать",
@@ -471,8 +523,9 @@ function score(list, key = "pctA", nkey = "na") {
 const distKey = r => r.dist; // canal distances are unique (6500 Boğaziçi, 4500 Çanakkale, 7000 Meis–Kaş)
 
 /* ---------- state ---------- */
-const F = Object.assign({ mode: "all", sex: "M", ag: "35-39", dist: 5000, wet: 0, years: "all", cut: 15 }, store.get("filters", {}));
-if (F.fv !== 2) { F.mode = "all"; F.fv = 2; } // strait crossings included by default (g, 2026-10-17)
+const F = Object.assign({ mode: "all", sex: "M", ag: "35-39", dist: 5000, wet: 0, years: "3", cut: 15 }, store.get("filters", {}));
+if (F.fv !== 2 && F.fv !== 3) F.mode = "all"; // strait crossings included by default (g, 2026-10-17)
+if (F.fv !== 3) { F.years = "3"; F.fv = 3; } // last 3 seasons by default across the site (g, 2026-11-08)
 let view = { name: "rank" }, limit = 100, metric = store.get("metric", "pct"), cmpB = null;
 
 /* ---------- search (top bar and compare slots) ---------- */
@@ -568,7 +621,7 @@ function renderRank() {
   const at = hl == null ? -1 : rows.findIndex(r => r.s.i === hl);
   if (at >= limit) limit = Math.ceil((at + 1) / 100) * 100;
   const shown = rows.slice(0, limit);
-  $("#main").innerHTML = `<p class="hint">${t("rankHint", total, raceCount)}</p>
+  $("#main").innerHTML = `<div class="panel" id="popular" hidden></div><p class="hint">${t("rankHint", total, raceCount)}</p>
   <div class="panel"><div class="tablewrap">${rows.length ? `<table class="rank">
     <thead><tr><th class="num">${t("colRank")}</th><th>${t("colName")}</th><th class="hide-sm">${t("colClub")}</th>
       <th class="num hide-sm">${t("colRaces")}</th><th class="num">${t("colAvg")}</th><th class="num">${t("colMedals")}</th><th class="num hide-sm">${t("colBest")}</th><th class="hide-sm">${t("colLast")}</th></tr></thead>
@@ -583,6 +636,10 @@ function renderRank() {
     ${rows.length > limit ? `<button class="more" type="button" id="more">${t("moreRows", Math.min(100, rows.length - limit))}</button>` : ""}</div>`;
   const more = $("#more"); if (more) more.onclick = () => { limit += 100; renderRank(); };
   bindRows();
+  topViewed().then(top => { const el = $("#popular"); if (!el || !top.length || view.name !== "rank") return;
+    el.innerHTML = `<div class="phead"><h3>${t("popularH")}</h3><span class="sub">${t("popularNote")}</span></div>
+      <div class="pop">${top.map(({ s, v }) => `<a href="#/s/${s.i}">${esc(s.name)}<small>${eye}${v.toLocaleString({ tr: "tr-TR", en: "en-GB", ru: "ru-RU" }[lang])}</small></a>`).join("")}</div>`;
+    el.hidden = false; el.style.marginBottom = "14px"; });
   const me = document.querySelector("tr.me"); if (me) me.scrollIntoView({ block: "center" });
   hl = null;
 }
@@ -603,35 +660,70 @@ function groupByDist(res) {
 const groupLab = g => t("km", g.d) + (g.canal ? "" : " · " + t(g.wet ? "wet" : "skin"));
 const medal = p => p && p <= 3 ? `<span class="medal m${p}" aria-label="${p}">${p}</span>` : "";
 const SL = { s: -1, brand: "all", dist: "all" }; // race-list filters on a swimmer page, reset per swimmer
+let SWY = store.get("swYears", "3"); // swimmer page years: last 3 seasons by default (g, 2026-11-08)
+const medRow = (m, big) => m.some(Boolean) ? `<span class="mc${big ? " big" : ""}">${m.map((v, k) => v ? `<span title="${t(["gold", "silver", "bronze"][k])}"><i class="m${k + 1}"></i>${v}</span>` : "").join("")}</span>` : `<span class="sub">–</span>`;
+const medCount = (list, key) => [1, 2, 3].map(k => list.filter(x => x[key] === k).length);
+// a chip shows the age-group place, or the overall place where no age groups were published
+const chipPlace = x => x.pa ?? x.ps;
+function careerRow(y, rs) {
+  rs = rs.slice().sort((a, b) => (a.r.date || "").localeCompare(b.r.date || "") || a.r.dist - b.r.dist || a.r.wet - b.r.wet);
+  const cl = [...new Set(rs.map(x => x.c).filter(c => c >= 0))];
+  const sc = score(rs);
+  const chips = rs.map(x => { const p = chipPlace(x), out = x.time == null;
+    const tip = [raceName(x.r), dateTxt(x.r), t("km", x.r.dist) + (x.r.canal ? "" : " " + t(x.r.wet ? "wet" : "skin")), out ? x.st || t("dnf") : `${fmtT(x.time)} · ${fmtP(paceOf(x))}/100 m`,
+      x.pa ? `${t("colAgPct")} ${x.pa}/${x.na}` : "", x.ps ? `${t("colAllPct")} ${x.ps}/${x.ns}` : ""].filter(Boolean).join(" · ");
+    return `<a class="chip${x.r.wet && !x.r.canal ? " wet" : ""}${out ? " out" : ""}" href="#/r/${x.r.i}" style="--c:${dcol(x.r.dist)}" title="${esc(tip)}"><b>${esc(t("km", x.r.dist))}</b>${x.r.canal ? "" : esc(x.r.brand)}${x.r.stage ? " " + esc(x.r.stage) : ""}${out ? ` <span class="sub">${esc(x.st || t("dnf"))}</span>` : p && p <= 3 ? medal(p) : p ? ` <span class="sub">${p}.</span>` : ""}</a>`; }).join("");
+  return `<tr><td class="yr">${y}</td><td class="clc">${cl.length ? cl.map(c => `<a class="clink" href="#/k/${c}">${esc(CLUBS[c].name)}</a>`).join("<br>") : '<span class="sub">–</span>'}</td>
+    <td class="chc"><div class="chips">${chips}</div></td><td class="num so">${medRow(medCount(rs, "ps"))}</td><td class="num sa">${medRow(medCount(rs, "pa"))}</td>
+    <td class="num sp">${sc ? t("top", pctTxt(sc.avg)) : "–"}</td></tr>`;
+}
+function catLine(s) {
+  const { rows, total } = rankRows(), k = rows.findIndex(r => r.s.i === s.i);
+  if (k < 0) return "";
+  const lab = [F.ag, t("km", F.dist), isCanalD(F.dist) ? "" : (+F.wet ? t("wet") : t("skin")), F.years === "all" ? "" : t("lastN", +F.years)].filter(Boolean).join(" · ");
+  return `<a class="catl" href="#/" id="catLink">${esc(t("inCatLine", lab, k + 1, total, Math.round(rows[k].rp) || 1))} →</a>`;
+}
 function renderSwimmer(s) {
-  const groups = groupByDist(s.res);
-  const ags = [...new Set(s.res.map(x => x.ag).filter(Boolean))].reverse();
+  const yMin = MAXY - 2, recent = s.res.filter(x => x.r.year >= yMin), useAll = SWY === "all" || !recent.length;
+  const res = useAll ? s.res : recent;
+  const groups = groupByDist(res);
+  const years = [...new Set(res.map(x => x.r.year))].sort((a, b) => b - a);
+  const sc = score(res), lastAg = (s.res.find(x => x.ag) || {}).ag;
+  const kpi = (k, v, sub) => `<div class="kpi"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${sub}</div></div>`;
   $("#main").innerHTML = `<button class="back" type="button" id="back">← ${t("backRank")}</button>
-  <div class="panel"><div class="prof">
-    <div class="ptop"><div><h1 class="pname">${esc(s.name)}</h1>
-      <div class="meta">${t(s.sex) || ""}${s.birth ? ` · ${t(s.birth[2] ? "born" : "bornEst")}: ${s.birth[0] === s.birth[1] ? (s.birth[2] ? "" : "~") + s.birth[0] : s.birth[0] + "–" + s.birth[1]}` : ""}${ags.length ? ` · ${t("ageGroups")}: ${ags.map(esc).join(", ")}` : ""}</div>
-      ${(() => { const cs = [...new Set(s.res.map(x => x.c).filter(c => c >= 0))];
-        return cs.length ? `<div class="meta">${t("clubs")}: ${cs.map(c => `<a class="clink" href="#/k/${c}">${esc(CLUBS[c].name)}</a>`).join(" · ")}</div>` : ""; })()}</div>
-</div>
-    <div class="strip">
-      ${(() => { const { rows, total } = rankRows(), k = rows.findIndex(r => r.s.i === s.i), lab = [F.ag, t("km", F.dist), isCanalD(F.dist) ? "" : (+F.wet ? t("wet") : t("skin"))].filter(Boolean).join(" · ");
-        return k < 0 ? `<div class="stat" style="--c:var(--buoy)"><div class="k">${esc(lab)}</div><div class="v">–</div><div class="s">${t("notInCat")}</div></div>`
-          : `<div class="stat link" id="catCard" role="link" tabindex="0" style="--c:var(--buoy)"><div class="k">${esc(lab)}</div><div class="v">${t("top", Math.round(rows[k].rp) || 1)}</div>
-            <div class="s">${k + 1} / ${total} · <a href="#/" onclick="return false">${t("showInRank")}</a></div></div>`; })()}
-      <div class="stat"><div class="k">${t("totalRaces")}</div><div class="v">${s.res.length}</div><div class="s">${new Set(s.res.map(x => x.r.year)).size} ${t("yearsWord")}</div></div>
-      ${groups.map(({ d, list, ...g }) => { const sc = score(list); return `<div class="stat" style="--c:${dcol(d)}"><div class="k">${esc(groupLab({ d, ...g }))}</div>
-        <div class="v">${sc ? t("top", pctTxt(sc.avg)) : "–"}</div><div class="s">${list.length} ${list.length === 1 ? t("race") : t("races")}${sc ? ` · ${t("best")} ${t("top", pctTxt(sc.best))}` : ""}</div></div>`; }).join("")}
-    </div></div></div>
+  <div class="panel"><div class="pf-hero">
+    <div class="pf-id"><div class="pf-av" aria-hidden="true">${esc(initials(s.name))}</div><div>
+      <h1 class="pname">${esc(s.name)}</h1>
+      <div class="meta">${t(s.sex) || ""}${s.birth ? ` · ${t(s.birth[2] ? "born" : "bornEst")}: ${s.birth[0] === s.birth[1] ? (s.birth[2] ? "" : "~") + s.birth[0] : s.birth[0] + "–" + s.birth[1]}` : ""}${lastAg ? ` · ${t("lastAg")}: <b style="white-space:nowrap">${esc(lastAg)}</b>` : ""}</div>
+      <div class="meta">${catLine(s)}</div>
+      <div class="meta views" id="views" hidden></div></div></div>
+    <div class="pf-right">
+      <div class="pf-yrs"><div class="seg" id="swYears" role="group"></div>${!recent.length ? `<span class="sub">${t("noRecent")}</span>` : ""}</div>
+      <div class="pf-kpis">
+        ${kpi(t("totalRaces"), res.length, `${years.length} ${t("seasons")} · ${years.length > 1 ? years.at(-1) + "–" + years[0] : years[0]}`)}
+        ${kpi(t("kOverall"), medRow(medCount(res, "ps"), 1), t("kOverallSub"))}
+        ${kpi(t("kAg"), medRow(medCount(res, "pa"), 1), t("kAgSub"))}
+        ${kpi(t("kAvg"), sc ? t("top", pctTxt(sc.avg)) : "–", t("kAvgSub"))}
+      </div></div>
+  </div></div>
+  <div class="panel"><div class="phead"><h3>${t("careerH")}</h3><span class="sub">${t("careerNote")}</span></div>
+    <div class="tablewrap"><table class="yt"><thead><tr><th>${t("year")}</th><th>${t("colClub")}</th><th>${t("colRace")}</th>
+      <th class="num">${t("colAllPct")}</th><th class="num">${t("thAg")}</th><th class="num">${t("percentile")}</th></tr></thead>
+    <tbody>${years.map(y => careerRow(y, res.filter(x => x.r.year === y))).join("")}</tbody></table></div></div>
   <div class="panel"><div class="phead"><h3>${t("historyH")}</h3>
     <div class="seg" id="metric" role="group"></div></div>
     <div class="legend" id="legend"></div><div class="chartbox chart" id="chart"></div></div>
   <div class="panel"><div class="phead"><h3>${t("raceListH")}</h3><span class="sub" id="slCount"></span></div>
-    <div class="ctrls slf"><div class="fld"><span>${t("series")}</span>${selectHTML("slBrand", [["all", t("all")], ...[...new Set(s.res.map(x => x.r.brand))].sort().map(b => [b, b])], SL.brand)}</div>
-      <div class="fld"><span>${t("distance")}</span>${selectHTML("slDist", [["all", t("all")], ...DISTS.all.filter(d => s.res.some(x => x.r.dist === d)).map(d => [d, t("km", d)])], SL.dist)}</div></div>
+    <div class="ctrls slf"><div class="fld"><span>${t("series")}</span>${selectHTML("slBrand", [["all", t("all")], ...[...new Set(res.map(x => x.r.brand))].sort().map(b => [b, b])], SL.brand)}</div>
+      <div class="fld"><span>${t("distance")}</span>${selectHTML("slDist", [["all", t("all")], ...DISTS.all.filter(d => res.some(x => x.r.dist === d)).map(d => [d, t("km", d)])], SL.dist)}</div></div>
     <div class="tablewrap"><table><thead><tr><th class="hide-sm">${t("colDate")}</th><th>${t("colRace")}</th><th>${t("colDist")}</th>
       <th class="num">${t("colPace")}</th><th class="num hide-sm">${t("colTime")}</th><th class="num">${t("colAgPct")}</th><th class="num hide-sm">${t("colAllPct")}</th></tr></thead>
     <tbody id="slBody"></tbody></table></div></div>`;
-  const slRows = () => s.res.filter(x => (SL.brand === "all" || x.r.brand === SL.brand) && (SL.dist === "all" || x.r.dist === +SL.dist));
+  segment($("#swYears"), [["3", t("lastN", 3), !recent.length], ["all", t("allYears")]], useAll ? "all" : "3", v => { SWY = v; store.set("swYears", v); renderSwimmer(s); });
+  if (SL.s !== s.i) Object.assign(SL, { s: s.i, brand: "all", dist: "all" });
+  if (!res.some(x => x.r.brand === SL.brand)) SL.brand = "all";
+  if (!res.some(x => x.r.dist === +SL.dist)) SL.dist = "all";
+  const slRows = () => res.filter(x => (SL.brand === "all" || x.r.brand === SL.brand) && (SL.dist === "all" || x.r.dist === +SL.dist));
   const drawSL = () => { const rs = slRows(); $("#slCount").textContent = `${rs.length} ${t("races")}`;
     $("#slBody").innerHTML = rs.map(x => { const out = x.time == null; return `<tr class="go${out ? " out" : ""}" tabindex="0" data-r="${x.r.i}">
       <td class="num hide-sm" style="text-align:left">${dateTxt(x.r)}</td><td>${esc(x.r.brand)}${x.r.stage ? ` <span class="sub">${esc(x.r.stage)}</span>` : ""}<span class="sm">${dateTxt(x.r)}</span></td>
@@ -640,15 +732,47 @@ function renderSwimmer(s) {
       <td class="num">${x.pa ? `${t("top", pctTxt(x.pctA))} <span class="sub">${x.pa}/${x.na}</span>${medal(x.pa)}` : "–"}</td>
       <td class="num hide-sm">${x.ps ? `${t("top", pctTxt(x.pctS))} <span class="sub">${x.ps}/${x.ns}</span>${medal(x.ps)}` : "–"}</td></tr>`; }).join("");
     document.querySelectorAll("tr.go[data-r]").forEach(tr => { const o = () => go(`#/r/${tr.dataset.r}`); tr.onclick = o; tr.onkeydown = e => { if (e.key === "Enter") o(); }; }); };
-  if (SL.s !== s.i) Object.assign(SL, { s: s.i, brand: "all", dist: "all" });
   $("#slBrand").value = SL.brand; $("#slDist").value = SL.dist;
   $("#slBrand").onchange = e => { SL.brand = e.target.value; drawSL(); };
   $("#slDist").onchange = e => { SL.dist = e.target.value; drawSL(); };
   drawSL();
   $("#back").onclick = () => { hl = s.i; go("#/"); };
-  const cat = $("#catCard"); if (cat) cat.onclick = () => { hl = s.i; go("#/"); };
+  const cat = $("#catLink"); if (cat) cat.onclick = e => { e.preventDefault(); hl = s.i; go("#/"); };
   const drawM = () => { segment($("#metric"), [["pct", t("percentile")], ["pace", t("pace")]], metric, v => { metric = v; store.set("metric", v); drawM(); }); drawChart(s, groups); };
   drawM();
+  showViews(s);
+}
+const initials = n => { const w = n.split(/\s+/).filter(Boolean); return (w[0][0] + (w.length > 1 ? w.at(-1)[0] : "")).toLocaleUpperCase("tr"); };
+
+/* ---------- profile views ----------
+   Counted by a small Cloudflare Worker (worker/ in the repo): one view per visitor per profile per day.
+   Keyed by name + sex, because swimmer numbers in the URL shift when the data is rebuilt. VIEWS_API empty = feature off. */
+const VIEWS_API = "";
+const VIEWS_DEMO = false; // preview build only: made-up counts so the layout can be judged
+const viewKey = s => fold(s.name).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") + "-" + s.sex.toLowerCase();
+const demoViews = s => { let h = 7; for (const c of viewKey(s)) h = (h * 31 + c.charCodeAt(0)) % 9973; return 3 + Math.round(s.n * 6 + h % 120); };
+const VIEWED = new Set(); // POST once per profile per page load; the Worker dedupes per day
+const eye = `<svg width="15" height="15" viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8s2.6-5 7-5 7 5 7 5-2.6 5-7 5-7-5-7-5Z" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="8" r="2.2" fill="currentColor"/></svg>`;
+async function showViews(s) {
+  let n = null;
+  if (VIEWS_DEMO) n = demoViews(s);
+  else if (VIEWS_API) try {
+    const first = !VIEWED.has(s.i); VIEWED.add(s.i);
+    const r = await fetch(`${VIEWS_API}/v/${viewKey(s)}`, { method: first ? "POST" : "GET" });
+    if (r.ok) n = (await r.json()).views;
+  } catch { /* counter down: show nothing */ }
+  const el = $("#views");
+  if (!el || view.s !== s || n == null) return;
+  el.innerHTML = `${eye} ${esc(t("views", n.toLocaleString({ tr: "tr-TR", en: "en-GB", ru: "ru-RU" }[lang])))}`; el.hidden = false;
+}
+async function topViewed(n = 10) {
+  if (VIEWS_DEMO) return SW.filter(s => !s.unnamed && s.n).map(s => ({ s, v: demoViews(s) })).sort((a, b) => b.v - a.v).slice(0, n);
+  if (!VIEWS_API) return [];
+  try {
+    const r = await fetch(`${VIEWS_API}/top?n=${n * 2}`); if (!r.ok) return [];
+    const byKey = new Map(SW.filter(s => !s.unnamed).map(s => [viewKey(s), s]));
+    return (await r.json()).filter(e => byKey.has(e.k)).slice(0, n).map(e => ({ s: byKey.get(e.k), v: e.views }));
+  } catch { return []; }
 }
 
 /* Date on x, one line per distance and suit (wetsuit dashed); each race is its own point (age-group percentile or pace). */
@@ -774,7 +898,8 @@ function renderRace(r) {
 }
 
 /* ---------- clubs: Olympic-style medal table ---------- */
-const KF = Object.assign({ type: "sex", sex: "all", brand: "all", year: "all", dist: "all", view: "table" }, store.get("clubF", {}));
+const KF = Object.assign({ type: "sex", sex: "all", brand: "all", year: "l3", dist: "all", view: "table" }, store.get("clubF", {}));
+if (KF.yv !== 1) { KF.year = "l3"; KF.yv = 1; } // last 3 seasons by default (g, 2026-11-08)
 const BRANDS = [...new Set(RACES.map(r => r.brand))].sort((a, b) => RACES.filter(r => r.brand === b).length - RACES.filter(r => r.brand === a).length);
 const YEARS = [...new Set(RACES.map(r => r.year))].sort((a, b) => b - a);
 const placeOf = x => KF.type === "ag" ? x.pa : x.ps;
