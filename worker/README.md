@@ -1,6 +1,6 @@
 # Profile view counter
 
-A small Cloudflare Worker with a D1 database. The site (index.html, `VIEWS_API`) calls it on every swimmer page and on the home page ("Most viewed profiles"). One view per visitor per profile per day; IPs are hashed with the day and never stored. Free-tier limits (100k Worker requests and 100k D1 writes a day) are far above current traffic.
+A small Cloudflare Worker with a D1 database. The site (index.html, `VIEWS_API`) calls it on every swimmer page and on the home page ("Most viewed profiles"). Each opening of a swimmer page counts once; a repeat from the same visitor within 10 minutes (reloads) is ignored. IPs are hashed and never stored. Free-tier limits (100k Worker requests and 100k D1 writes a day) are far above current traffic.
 
 Setup (once, needs a Cloudflare login):
 

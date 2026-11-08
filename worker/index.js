@@ -1,9 +1,9 @@
 // Profile view counter for aciksumasters.app (Cloudflare Worker + D1).
-//   POST /v/<key>  count a view (once per visitor per profile per day) and return { k, views }
+//   POST /v/<key>  count a view (each opening of a profile; a repeat from the same visitor within 10 minutes is ignored) and return { k, views }
 //   GET  /v/<key>  return { k, views }
 //   GET  /top?n=20 return [{ k, views }], most viewed first
 // <key> is the swimmer's folded name + sex (e.g. "duygun-yurteri-m"), set by index.html (viewKey).
-// Visitors are told apart by a daily hash of IP + key; the IP itself is never stored.
+// Visitors are told apart by a hash of IP + key + 10-minute slot; the IP itself is never stored.
 const SITE = "https://aciksumasters.app";
 const ALLOWED = [SITE, "https://www.aciksumasters.app"];
 const BOT = /bot|crawl|spider|slurp|preview|monitor|headless|lighthouse/i;
@@ -27,8 +27,8 @@ export default {
     if (m) {
       const k = m[1];
       if (req.method === "POST" && ALLOWED.includes(origin) && !BOT.test(req.headers.get("user-agent") || "")) {
-        const day = new Date().toISOString().slice(0, 10);
-        const h = await sha256(`${req.headers.get("cf-connecting-ip") || ""}|${k}|${day}|${env.SALT || ""}`);
+        const day = new Date().toISOString().slice(0, 10), slot = Math.floor(Date.now() / 600000);
+        const h = await sha256(`${req.headers.get("cf-connecting-ip") || ""}|${k}|${slot}|${env.SALT || ""}`);
         const seen = await env.DB.prepare("INSERT OR IGNORE INTO seen (h, day) VALUES (?, ?)").bind(h, day).run();
         if (seen.meta.changes) await env.DB.prepare("INSERT INTO views (k, n) VALUES (?, 1) ON CONFLICT (k) DO UPDATE SET n = n + 1").bind(k).run();
         if (Math.random() < 0.01) ctx.waitUntil(env.DB.prepare("DELETE FROM seen WHERE day < ?").bind(day).run());
