@@ -5,4 +5,4 @@ compatibility_date = "2026-10-01"
 [[d1_databases]]
 binding = "DB"
 database_name = "aciksumasters-views"
-database_id = "REPLACE_WITH_ID_FROM_wrangler_d1_create"
+database_id = "cf40b5d1-ce2b-4d6a-af11-fe275d5a9cb2"

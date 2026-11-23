@@ -770,7 +770,7 @@ const initials = n => { const w = n.split(/\s+/).filter(Boolean); return (w[0][0
    Counted by a small Cloudflare Worker (worker/ in the repo): each opening of a swimmer page counts once; re-drawing the
    same page (language switch) does not, and the Worker ignores a repeat from the same visitor within 10 minutes (reloads).
    Keyed by name + sex, because swimmer numbers in the URL shift when the data is rebuilt. VIEWS_API empty = feature off. */
-const VIEWS_API = "";
+const VIEWS_API = "https://aciksumasters-views.aciksumasters-views.workers.dev";
 const VIEWS_DEMO = false; // preview build only: made-up counts so the layout can be judged
 const viewKey = s => fold(s.name).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") + "-" + s.sex.toLowerCase();
 const demoViews = s => { let h = 7; for (const c of viewKey(s)) h = (h * 31 + c.charCodeAt(0)) % 9973; return 1 + Math.round(Math.min(s.n, 40) / 3 + h % 97); };
